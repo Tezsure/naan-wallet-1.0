@@ -1,0 +1,199 @@
+def localProperties = new Properties()
+def localPropertiesFile = rootProject.file('local.properties')
+if (localPropertiesFile.exists()) {
+    localPropertiesFile.withReader('UTF-8') { reader ->
+        localProperties.load(reader)
+    }
+}
+
+def flutterRoot = localProperties.getProperty('flutter.sdk')
+if (flutterRoot == null) {
+    throw new GradleException("Flutter SDK not found. Define location with flutter.sdk in the local.properties file.")
+}
+
+def flutterVersionCode = localProperties.getProperty('flutter.versionCode')
+if (flutterVersionCode == null) {
+    flutterVersionCode = '1'
+}
+
+def flutterVersionName = localProperties.getProperty('flutter.versionName')
+if (flutterVersionName == null) {
+    flutterVersionName = '1.0'
+}
+
+apply plugin: 'com.android.application'
+//apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlinx-serialization'
+//apply plugin: 'org.jetbrains.dokka'
+apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
+
+android {
+
+    compileSdkVersion 31
+
+    sourceSets {
+        main.java.srcDirs += 'src/main/kotlin'
+        //     main {
+        //     // The libs directory contains prebuilt libraries that are used by the
+        //     // app's library defined in CMakeLists.txt via an IMPORTED target.
+        //     jniLibs.setSrcDirs(listOf("libs"))
+        // }
+    }
+
+    // lintOptions {
+    //     disable 'InvalidPackage'
+    // }
+
+    defaultConfig {
+        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
+        applicationId "com.naan"
+        minSdkVersion 23
+        targetSdkVersion 31
+        versionCode 7
+        versionName '1.3.0'
+        // ndk {
+        //     // Filter for architectures supported by Flutter.
+        //     abiFilters 'x86', 'x86_64', 'armeabi', 'armeabi-v7a', 'arm64-v8a'
+        // }
+    }
+
+    buildTypes {
+
+        release {
+            // TODO: Add your own signing config for the release build.
+            // Signing with the debug keys for now, so `flutter run --release` works.
+            signingConfig signingConfigs.debug
+            useProguard true
+            minifyEnabled false
+            shrinkResources false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
+
+    packagingOptions {
+        pickFirst '**/*.so'
+    }
+}
+
+flutter {
+    source '../..'
+}
+
+
+repositories {
+    // Add this to the end of any existing repositories
+    mavenCentral()
+    google()
+}
+
+dependencies {
+    implementation fileTree(dir: "libs", include: ["*.jar"])
+
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+//    implementation "com.github.airgap-it:beacon-android-sdk:1.0.3"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.5.0"
+    implementation 'com.google.code.gson:gson:2.8.7'
+
+    def withoutJna = { exclude group: 'net.java.dev.jna' }
+    def beaconVersion = "3.1.1-beta01"
+    
+    implementation "com.github.airgap-it.beacon-android-sdk:core:$beaconVersion", withoutJna // core, **required**
+    implementation "com.github.airgap-it:beacon-android-sdk:$beaconVersion", withoutJna
+
+    implementation "net.java.dev.jna:jna:5.9.0@aar"
+
+//    implementation "net.java.dev.jna:jna:5.9.0@aar"
+
+    // alternatively, all modules
+
+
+//    // versions
+//    def androidxCore = "1.3.2"
+//    def androidxAppCompat = "1.2.0"
+//    def androidxConstraintLayout = "2.0.4"
+//
+//    def androidxActivity = "1.2.3"
+//    def androidxLifecycle = "2.3.1"
+//
+//    def androidxSecurity = "1.0.0"
+//
+//    def coroutines = "1.5.0"
+//
+//    def ktor = "1.5.4"
+//
+//    def lazySodium = "5.0.2"
+//    def jna = "5.8.0"
+//
+//    def materialComponents = "1.3.0"
+//
+//    def junit = "4.13.2"
+//
+//    def androidxJunit = "1.1.2"
+//    def androidxEspresso = "3.3.0"
+//
+//    def mockk = "1.11.0"
+//
+//    // required by beacon
+//    implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
+//
+//    def kotlinSerialization = "1.2.1"
+//
+//    implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:$kotlinSerialization"
+//    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutines"
+//    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutines"
+//
+//    implementation "io.ktor:ktor-client-okhttp:$ktor"
+//    implementation "io.ktor:ktor-client-json:$ktor"
+//    implementation "io.ktor:ktor-client-serialization-jvm:$ktor"
+//    implementation "io.ktor:ktor-client-logging-jvm:$ktor"
+//
+//    implementation "androidx.core:core-ktx:$androidxCore"
+//
+//    implementation "androidx.appcompat:appcompat:$androidxAppCompat"
+//    implementation "androidx.constraintlayout:constraintlayout:$androidxConstraintLayout"
+//
+//    implementation "androidx.activity:activity-ktx:$androidxActivity"
+//
+//    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$androidxLifecycle"
+//    implementation "androidx.lifecycle:lifecycle-livedata-ktx:$androidxLifecycle"
+//    implementation "androidx.lifecycle:lifecycle-runtime-ktx:$androidxLifecycle"
+//
+//    implementation "androidx.security:security-crypto:$androidxSecurity"
+//
+//    implementation "com.google.android.material:material:$materialComponents"
+//
+//    implementation "com.goterl:lazysodium-android:${lazySodium}@aar"
+//    implementation "net.java.dev.jna:jna:${jna}@aar"
+
+
+//    implementation "org.jetbrains.kotlin:kotlin-test:$kotlin"
+//    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutines"
+//
+//    implementation "junit:junit:$junit"
+//
+//    implementation "androidx.test.ext:junit:$androidxJunit"
+//    implementation "androidx.test.espresso:espresso-core:$androidxEspresso"
+//
+//    implementation "io.mockk:mockk:$mockk"
+
+}
+//dokkaHtml.configure {
+//    dokkaSourceSets {
+//        named("main") {
+//            noAndroidSdkLink.set(false)
+//        }
+//    }
+//}
+
+apply plugin: 'com.google.gms.google-services'
+apply plugin: 'com.google.firebase.crashlytics'
