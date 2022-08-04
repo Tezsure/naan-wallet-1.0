@@ -25,8 +25,9 @@ For help getting started with Flutter, view our [online documentation](https://f
 
 ## Requirements
 
-* Flutter v2.3.x
-* Dart v2.10.x
+* Flutter v2.0.6
+* [Android Studio](https://developer.android.com/studio?gclid=CjwKCAjw3K2XBhAzEiwAmmgrAt5_YcC3ioQZtDywUHoioOSz6PQ4fG2VxJL_Sx3j7HKfaC3ZeHTo1BoCfWwQAvD_BwE&gclsrc=aw.ds#downloads) 
+* [Xcode](https://developer.apple.com/xcode/resources/) // To build project on macOS
 
 ## Install
 
@@ -36,9 +37,9 @@ Check if the version number is correct, and the version that requires flutter is
 
 The recommended version of flutter here is 2.0.6, the download address is as follows:
 
-[windows_2.5.0-stable](https://storage.googleapis.com/flutter_infra_release/releases/stable/windows/flutter_windows_2.5.0-stable.zip)
+[windows_2.0.6-stable](https://storage.googleapis.com/flutter_infra_release/releases/stable/windows/flutter_windows_2.0.6-stable.zip)
 
-[macos_2.5.0-stable](https://storage.googleapis.com/flutter_infra_release/releases/stable/macos/flutter_macos_2.5.0-stable.zip)
+[macos_2.0.6-stable](https://storage.googleapis.com/flutter_infra_release/releases/stable/macos/flutter_macos_2.0.6-stable.zip)
 
 [Note] If your flutter version is a 1.x.xversion, please upgrade your flutter version, or you will encounter errors.
 
@@ -64,6 +65,11 @@ flutter pub get
 
 ```sh
 flutter run // To run the app
+```
+
+* To build the app
+
+```sh
 flutter build ios // To build the app for ios
 flutter build android // To build the app for android
 ```
