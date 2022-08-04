@@ -38,7 +38,7 @@ class HomePageView extends GetView<HomePageController> {
       NftView(
         controller: controller,
       ),
-      Container(),
+      DappWidget(controller),
       SettingsPageView(
         controller: controller,
       ),

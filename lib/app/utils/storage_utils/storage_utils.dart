@@ -35,7 +35,9 @@ class StorageUtils {
   ];
 
   static final List<String> testNodes = [
-    "https://ithacanet.ecadinfra.com",
+    "https://rpc.tzkt.io/ghostnet",
+    "https://rpc.tzkt.io/jakartanet",
+
   ];
 
   init() async {
