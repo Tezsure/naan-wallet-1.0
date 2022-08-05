@@ -187,6 +187,8 @@ Widget changeNetworkBottomSheet({HomePageController controller, int index}) {
     await StorageUtils()
         .getCurrentSelectedNode(controller.storage.provider == "delphinet");
     controller.isHomePageLoading.value = true;
+    controller.balance.value = '0';
+    controller.tokenXtzBalance.value = 0;
     RestartWidget.restartApp(context);
     Navigator.of(context).pop();
   }
@@ -313,7 +315,11 @@ Widget changeNodeBottomSheet(HomePageController controller) {
     StorageUtils().setCurrentSelectedNode(
         controller.storage.provider == "mainnet"
             ? StorageUtils.mainNodes[index]
-            : StorageUtils.testNodes[index]);
+            : StorageUtils.testNodes[index],
+        controller.storage.provider == "mainnet");
+    controller.isHomePageLoading.value = true;
+    controller.balance.value = '0';
+    controller.tokenXtzBalance.value = 0;
     RestartWidget.restartApp(context);
     Navigator.of(context).pop();
   }

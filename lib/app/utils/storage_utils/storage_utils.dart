@@ -37,7 +37,6 @@ class StorageUtils {
   static final List<String> testNodes = [
     "https://rpc.tzkt.io/ghostnet",
     "https://rpc.tzkt.io/jakartanet",
-
   ];
 
   init() async {
@@ -111,30 +110,31 @@ class StorageUtils {
 
   Future<void> getCurrentSelectedNode(bool isTestNet) async {
     if (isTestNet) {
-      StorageSingleton().currentSelectedNode = testNodes[0];
-      DataHandlerController().updaterpcUrl(testNodes[0]);
-      // if (StorageSingleton().currentSelectedNode != null)
-      //   return StorageSingleton().currentSelectedNode;
-      // StorageSingleton().currentSelectedNode =
-      //     await TezsterDatabase().getFromStorage("current_selected_node");
-      // if (StorageSingleton().currentSelectedNode == null) {
-      //   StorageSingleton().currentSelectedNode = testNodes[0];
-      //   setCurrentSelectedNode(StorageSingleton().currentSelectedNode);
-      // }
+      StorageSingleton().currentSelectedNode =
+          await TezsterDatabase().getFromStorage("current_selected_node");
+      // DataHandlerController().updaterpcUrl(testNodes[0]);
+      if (StorageSingleton().currentSelectedNode == null) {
+        StorageSingleton().currentSelectedNode = testNodes[0];
+      }
+      setCurrentSelectedNode(StorageSingleton().currentSelectedNode,true);
     } else {
       StorageSingleton().currentSelectedNode =
           await TezsterDatabase().getFromStorage("current_selected_node");
       if (StorageSingleton().currentSelectedNode == null) {
         StorageSingleton().currentSelectedNode = mainNodes[0];
       }
-      setCurrentSelectedNode(StorageSingleton().currentSelectedNode);
+      setCurrentSelectedNode(StorageSingleton().currentSelectedNode,false);
     }
   }
 
-  void setCurrentSelectedNode(String node) async {
+  void setCurrentSelectedNode(String node, [bool isTestNet]) async {
     StorageSingleton().currentSelectedNode = node;
     DataHandlerController().updaterpcUrl(node);
     TezsterDatabase().setInStorage("current_selected_node", node);
-    rpc['mainnet'] = node;
+    if (isTestNet) {
+      rpc['delphinet'] = node;
+    } else {
+      rpc['mainnet'] = node;
+    }
   }
 }
