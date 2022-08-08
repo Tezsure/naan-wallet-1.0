@@ -7,6 +7,7 @@ import 'package:tezster_dart/helper/http_helper.dart' as http_helper;
 import 'package:tezster_dart/tezster_dart.dart';
 import 'package:tezster_wallet/app/modules/common/functions/isolate_process.dart';
 import 'package:tezster_wallet/app/utils/apis_handler/http_helper.dart';
+import 'package:tezster_wallet/app/utils/storage_utils/storage_singleton.dart';
 import 'package:tezster_wallet/models/tokens_model.dart';
 import 'package:tezster_wallet/models/tzkt_txs_model.dart';
 
@@ -50,7 +51,7 @@ class DataHandlerController {
   // Data variables
   DataVariable xtzBalance = DataVariable<String>()..isUpdate = true;
   DataVariable dollarValue = DataVariable<double>()..isUpdate = true;
-  DataVariable tzktTransactionModels = DataVariable<List<TzktTxsModel>>();
+  DataVariable tzktTransactionModels = DataVariable<List<TzktTxsModel>>()..isUpdate = true;
   DataVariable tokensModels = DataVariable<List<TokensModel>>()
     ..isUpdate = true;
   DataVariable tokenBalanceInXtz = DataVariable<int>();
@@ -200,17 +201,22 @@ class DataHandlerController {
       DataHandlerController().accountAddress,
       DataHandlerController().provider,
       DataHandlerController().tezsureApi,
+      StorageSingleton().currentSelectedNetwork,
     ], debugName: "tzkt_transaction_models_isolate");
   }
 
   // xtz balance update method
   static Future<void> updatetzktTransactionModels(
       List<Object> arguments) async {
+    var currentSelectedNetwork = arguments[4] as String;
     var lastId = '';
     var lastData = 0;
     var data = <TzktTxsModel>[];
     do {
-      var tempData = await HttpHelper.performGetRequest('https://api.tzkt.io',
+      var tempData = await HttpHelper.performGetRequest(
+          currentSelectedNetwork.isEmpty
+              ? 'https://api.tzkt.io'
+              : 'https://api.$currentSelectedNetwork.tzkt.io',
           "v1/accounts/${arguments[1]}/operations?type=transaction&limit=999&sort=1&quote=usd&lastId=$lastId");
       if (tempData.length != 0) {
         tempData = tempData
@@ -406,11 +412,11 @@ class DataHandlerController {
       secretKey: (arguments[1] as Map)['secretKey'],
     );
     var rpc = arguments[2];
-    var tezsureApi = arguments[3];
+    // var tezsureApi = arguments[3];
     var receiver = arguments[4];
     var amount = arguments[5];
-    var network = arguments[6];
-    var usd = arguments[7];
+    // var network = arguments[6];
+    // var usd = arguments[7];
     var transactionSigner = await TezsterDart.createSigner(
         TezsterDart.writeKeyWithHint(keyStore.secretKey, 'edsk'));
     var transactionResult = await TezsterDart.sendTransactionOperation(
@@ -423,24 +429,6 @@ class DataHandlerController {
     );
 
     print("=============> $transactionResult");
-
-    //operationGroupID
-    if (transactionResult['operationGroupID'] != '') {
-      await HttpHelper.performPostRequest(
-          tezsureApi, 'v1/tezsure/transactions/post', {
-        "publicKeyHash": keyStore.publicKeyHash,
-        "receiver": receiver,
-        "timestamp": DateTime.now().toString(),
-        "operationHash": transactionResult['operationGroupID']
-            .toString()
-            .replaceAll('\n', ''),
-        "networkId": network == 'mainnet' ? 1 : 0,
-        "status": "pending",
-        "label": "Tezos transfer",
-        "amount": amount,
-        "usd": usd,
-      });
-    }
 
     var status = await TezsterDart.getOperationStatus(
         rpc, transactionResult['operationGroupID'].replaceAll('\n', '').trim());

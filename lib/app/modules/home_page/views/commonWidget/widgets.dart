@@ -185,8 +185,16 @@ Widget changeNetworkBottomSheet({HomePageController controller, int index}) {
     });
     await StorageUtils().postStorage(controller.storage);
     await StorageUtils()
-        .getCurrentSelectedNode(controller.storage.provider == "delphinet");
+        .getCurrentSelectedNode(controller.storage.provider != "mainnet");
+    if (controller.storage.provider == "mainnet") {
+      StorageSingleton().currentSelectedNetwork = "";
+    } else {
+      StorageSingleton().currentSelectedNetwork =
+          StorageUtils.testNodes.keys.toList()[0];
+    }
     controller.isHomePageLoading.value = true;
+    controller.balance.value = '0';
+    controller.tokenXtzBalance.value = 0;
     RestartWidget.restartApp(context);
     Navigator.of(context).pop();
   }
@@ -313,7 +321,18 @@ Widget changeNodeBottomSheet(HomePageController controller) {
     StorageUtils().setCurrentSelectedNode(
         controller.storage.provider == "mainnet"
             ? StorageUtils.mainNodes[index]
-            : StorageUtils.testNodes[index]);
+            : StorageUtils
+                .testNodes[StorageUtils.testNodes.keys.toList()[index]],
+        controller.storage.provider != "mainnet");
+    if (controller.storage.provider == "mainnet") {
+      StorageSingleton().currentSelectedNetwork = "";
+    } else {
+      StorageSingleton().currentSelectedNetwork =
+          StorageUtils.testNodes.keys.toList()[index];
+    }
+    controller.isHomePageLoading.value = true;
+    controller.balance.value = '0';
+    controller.tokenXtzBalance.value = 0;
     RestartWidget.restartApp(context);
     Navigator.of(context).pop();
   }
@@ -321,7 +340,10 @@ Widget changeNodeBottomSheet(HomePageController controller) {
   return StatefulBuilder(builder: (BuildContext context, StateSetter setState) {
     List<String> nodes = controller.storage.provider == "mainnet"
         ? StorageUtils.mainNodes
-        : StorageUtils.testNodes;
+        : StorageUtils.testNodes.keys
+            .toList()
+            .map<String>((e) => StorageUtils.testNodes[e])
+            .toList();
     int currentSelectedNodeIndex =
         nodes.indexOf(StorageSingleton().currentSelectedNode);
     currentSelectedNodeIndex =

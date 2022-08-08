@@ -211,7 +211,7 @@ class _WalletPageViewState extends State<WalletPageView>
                                         color: Colors.white,
                                         fontWeight: FontWeight.bold,
                                         fontSize: widget
-                                            .controller.fontSizeHomePage.value,
+                                            .controller.fontSizeHomePage.value, 
                                       ),
                                     ),
                                   ),
