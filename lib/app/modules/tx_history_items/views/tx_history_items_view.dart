@@ -353,7 +353,9 @@ class _TxHistoryItemsViewState extends State<TxHistoryItemsView> {
                             return Column(
                               children: [
                                 Container(
-                                  height: 74,
+                                  constraints: BoxConstraints(
+                                    minHeight: 74,
+                                  ),
                                   decoration: BoxDecoration(
                                     color: Color(0xff1E1E1E),
                                     borderRadius: BorderRadius.all(

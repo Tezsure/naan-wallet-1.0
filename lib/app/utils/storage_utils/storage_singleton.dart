@@ -11,6 +11,7 @@ class StorageSingleton {
 
   StorageModel storage;
   String currentSelectedNode;
+  String currentSelectedNetwork = "";
   bool isTestNetSelected;
 
   updateStorage(StorageModel model) => this.storage = model;

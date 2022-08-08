@@ -34,10 +34,10 @@ class StorageUtils {
     "https://mainnet.api.tez.ie",
   ];
 
-  static final List<String> testNodes = [
-    "https://rpc.tzkt.io/ghostnet",
-    "https://rpc.tzkt.io/jakartanet",
-  ];
+  static final Map<String, String> testNodes = {
+    "ghostnet": "https://rpc.tzkt.io/ghostnet",
+    "jakartanet": "https://rpc.tzkt.io/jakartanet",
+  };
 
   init() async {
     var data = await databse.getTezsterDatabase();
@@ -64,9 +64,8 @@ class StorageUtils {
 
     //fetch current selected rpc
     var storage = await getStorage();
-    await getCurrentSelectedNode(storage.provider == "delphinet");
+    await getCurrentSelectedNode(storage.provider != "mainnet");
     rpc['mainnet'] = StorageSingleton().currentSelectedNode;
-
     return result;
   }
 
@@ -112,18 +111,17 @@ class StorageUtils {
     if (isTestNet) {
       StorageSingleton().currentSelectedNode =
           await TezsterDatabase().getFromStorage("current_selected_node");
-      // DataHandlerController().updaterpcUrl(testNodes[0]);
       if (StorageSingleton().currentSelectedNode == null) {
         StorageSingleton().currentSelectedNode = testNodes[0];
       }
-      setCurrentSelectedNode(StorageSingleton().currentSelectedNode,true);
+      setCurrentSelectedNode(StorageSingleton().currentSelectedNode, true);
     } else {
       StorageSingleton().currentSelectedNode =
           await TezsterDatabase().getFromStorage("current_selected_node");
       if (StorageSingleton().currentSelectedNode == null) {
         StorageSingleton().currentSelectedNode = mainNodes[0];
       }
-      setCurrentSelectedNode(StorageSingleton().currentSelectedNode,false);
+      setCurrentSelectedNode(StorageSingleton().currentSelectedNode, false);
     }
   }
 
@@ -133,7 +131,12 @@ class StorageUtils {
     TezsterDatabase().setInStorage("current_selected_node", node);
     if (isTestNet) {
       rpc['delphinet'] = node;
+      StorageSingleton().currentSelectedNetwork = testNodes.keys
+          .toList()
+          .where((element) => testNodes[element] == node)
+          .toList()[0];
     } else {
+      StorageSingleton().currentSelectedNetwork = "";
       rpc['mainnet'] = node;
     }
   }
