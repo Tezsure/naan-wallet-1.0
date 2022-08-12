@@ -76,7 +76,7 @@ flutter build android // To build the app for android
 - To test the app
 
 ```sh
-flutter test --coverage // To run the app
+flutter test --coverage // To test the app
 ```
 
 ### Build the project for iOS
