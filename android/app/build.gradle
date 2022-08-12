@@ -105,9 +105,9 @@ dependencies {
     implementation 'com.google.code.gson:gson:2.8.7'
 
     def withoutJna = { exclude group: 'net.java.dev.jna' }
-    def beaconVersion = "3.1.1-beta01"
+    def beaconVersion = "3.1.1"
     
-    implementation "com.github.airgap-it.beacon-android-sdk:core:$beaconVersion", withoutJna // core, **required**
+//    implementation "com.github.airgap-it.beacon-android-sdk:core:$beaconVersion", withoutJna // core, **required**
     implementation "com.github.airgap-it:beacon-android-sdk:$beaconVersion", withoutJna
 
     implementation "net.java.dev.jna:jna:5.9.0@aar"

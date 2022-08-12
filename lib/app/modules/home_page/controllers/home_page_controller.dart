@@ -112,7 +112,8 @@ class HomePageController extends GetxController {
   Future<void> onInit() async {
     super.onInit();
     bool isNameEdited = false;
-    storage = await StorageUtils().getStorage();
+    storage = StorageSingleton().storage;
+    // await StorageUtils().getStorage();
     List s = storage.accounts[storage.provider];
     for (int i = 0; i < s.length; i++) {
       if (!s[i].containsKey('name')) {
