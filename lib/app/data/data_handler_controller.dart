@@ -162,7 +162,7 @@ class DataHandlerController {
     var bal;
     try {
       TezsterDart.getBalance(arguments[1], arguments[2]).then((value) {
-        bal = value ?? '0';
+        bal = value ?? '0'; 
         (arguments[0] as SendPort).send(bal);
       }).timeout(Duration(seconds: 5));
     } catch (e) {}

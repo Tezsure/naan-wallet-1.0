@@ -182,6 +182,14 @@ class BeaconPlugin {
     // print("resumed $data");
   }
 
+  static Future<void> pair(String name, String data) async {
+    openConnectionDialog(name);
+    await platform.invokeMethod('pair', <String, dynamic>{
+      'uri': data,
+    });
+    print("addPeer = ");
+  }
+
   static Future<void> addPeer(id, name, publicKey, server, version) async {
     openConnectionDialog(name);
     await platform.invokeMethod('addPeer', <String, dynamic>{
@@ -217,13 +225,13 @@ class BeaconPlugin {
       if (!data.endsWith("}"))
         data = data.substring(0, data.lastIndexOf('}') + 1);
       var baseData = jsonDecode(data);
-      await BeaconPlugin.addPeer(
-        baseData['id'],
-        baseData['name'],
-        baseData['publicKey'],
-        baseData['relayServer'],
-        "2",
-      );
+      await BeaconPlugin.pair(baseData['name'], link);
+      //   baseData['id'],
+      //   baseData['name'],
+      //   baseData['publicKey'],
+      //   baseData['relayServer'],
+      //   "2",
+      // );
     } catch (e) {}
   }
 

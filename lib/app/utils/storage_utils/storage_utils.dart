@@ -110,14 +110,15 @@ class StorageUtils {
   Future<void> getCurrentSelectedNode(bool isTestNet) async {
     if (isTestNet) {
       StorageSingleton().currentSelectedNode =
-          await TezsterDatabase().getFromStorage("current_selected_node");
+          await TezsterDatabase().getFromStorage("test_node");
       if (StorageSingleton().currentSelectedNode == null) {
-        StorageSingleton().currentSelectedNode = testNodes[0];
+        StorageSingleton().currentSelectedNode =
+            testNodes[testNodes.keys.toList()[0]];
       }
       setCurrentSelectedNode(StorageSingleton().currentSelectedNode, true);
     } else {
       StorageSingleton().currentSelectedNode =
-          await TezsterDatabase().getFromStorage("current_selected_node");
+          await TezsterDatabase().getFromStorage("main_node");
       if (StorageSingleton().currentSelectedNode == null) {
         StorageSingleton().currentSelectedNode = mainNodes[0];
       }
@@ -128,14 +129,20 @@ class StorageUtils {
   void setCurrentSelectedNode(String node, [bool isTestNet]) async {
     StorageSingleton().currentSelectedNode = node;
     DataHandlerController().updaterpcUrl(node);
-    TezsterDatabase().setInStorage("current_selected_node", node);
     if (isTestNet) {
+      TezsterDatabase().setInStorage("test_node", node);
       rpc['delphinet'] = node;
-      StorageSingleton().currentSelectedNetwork = testNodes.keys
+      var nodes = testNodes.keys
           .toList()
           .where((element) => testNodes[element] == node)
-          .toList()[0];
+          .toList();
+      if (nodes.isEmpty) {
+        StorageSingleton().currentSelectedNetwork = testNodes.keys.toList()[0];
+      } else {
+        StorageSingleton().currentSelectedNetwork = nodes[0];
+      }
     } else {
+      TezsterDatabase().setInStorage("main_node", node);
       StorageSingleton().currentSelectedNetwork = "";
       rpc['mainnet'] = node;
     }

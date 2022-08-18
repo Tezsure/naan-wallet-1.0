@@ -6,6 +6,7 @@ import it.airgap.beaconsdk.blockchain.tezos.message.request.*
 import it.airgap.beaconsdk.blockchain.tezos.message.response.*
 import it.airgap.beaconsdk.blockchain.tezos.tezos
 import it.airgap.beaconsdk.client.wallet.BeaconWalletClient
+import it.airgap.beaconsdk.core.client.BeaconClient
 import it.airgap.beaconsdk.core.data.*
 import it.airgap.beaconsdk.core.message.*
 import it.airgap.beaconsdk.transport.p2p.matrix.p2pMatrix
@@ -31,7 +32,7 @@ class BeaconPlugin(
     }
 
     suspend fun startBeacon() {
-        beaconClient = BeaconWalletClient("Naan"){
+        beaconClient = BeaconWalletClient("Naan") {
             support(substrate(), tezos())
             use(p2pMatrix())
         }
@@ -57,6 +58,8 @@ class BeaconPlugin(
 
     fun respondExample(isGranted: Int, respondText: String, accountAddress: String) {
         val request = awaitingRequest ?: return
+        val beaconClient = beaconClient ?: return
+
         val response = when (request) {
             is PermissionTezosRequest -> if (isGranted == 0) ErrorBeaconResponse.from(
                 request,
@@ -64,13 +67,17 @@ class BeaconPlugin(
             ) else
                 PermissionTezosResponse.from(
                     request,
-                    createTezosAccount(respondText,accountAddress,request.network)
+                    createTezosAccount(respondText, accountAddress, request.network, beaconClient)
                 )
             is OperationTezosRequest -> if (isGranted == 0) ErrorBeaconResponse.from(
                 request,
                 BeaconError.Aborted
             ) else OperationTezosResponse.from(request, respondText)
-            is SignPayloadTezosRequest -> SignPayloadTezosResponse.from(request,SigningType.Micheline,respondText)
+            is SignPayloadTezosRequest -> SignPayloadTezosResponse.from(
+                request,
+                SigningType.Micheline,
+                respondText
+            )
             is BroadcastTezosRequest -> TODO()
             else -> TODO()
         }
@@ -86,9 +93,20 @@ class BeaconPlugin(
     private fun createTezosAccount(
         publicKey: String,
         accountAddress: String,
-        network: TezosNetwork
+        network: TezosNetwork,
+        client: BeaconClient<*>
     ): TezosAccount {
-        return TezosAccount(publicKey,accountAddress,network)
+        return TezosAccount(publicKey, accountAddress, network, client)
+    }
+
+    fun pair(uri: String){
+        GlobalScope.launch {
+            try {
+                beaconClient?.pair(uri);
+            }catch (e:Exception){
+                print(e);
+            }
+        }
     }
 
     fun addPeer(
@@ -106,14 +124,15 @@ class BeaconPlugin(
             version = version
         )
         Log.i("Data", "peer adding..")
-        // runBlocking { beaconClient?.addPeers(peer) }
         GlobalScope.launch {
-            beaconClient?.addPeers(peer)
-            checkForPeers()
+            try {
+                beaconClient?.addPeers(peer)
+//            checkForPeers(
+            } catch (e : Exception) {
+                print(e.message)
+            }
         }
         Log.i("Data", "peer adding after line..")
-        // checkForPeers()
-
     }
 
     private fun checkForPeers() {
@@ -145,6 +164,6 @@ class BeaconPlugin(
     companion object {
 
         var callback: Callback? = null
-        
+
     }
 }

@@ -313,13 +313,14 @@ class _DappWidgetState extends State<DappWidget>
                     if (!data.endsWith("}"))
                       data = data.substring(0, data.lastIndexOf('}') + 1);
                     var baseData = jsonDecode(data);
-                    await BeaconPlugin.addPeer(
-                      baseData['id'],
-                      baseData['name'],
-                      baseData['publicKey'],
-                      baseData['relayServer'],
-                      baseData['version'] ?? "2",
-                    );
+                    await BeaconPlugin.pair(baseData['name'], uri);
+                    // await BeaconPlugin.addPeer(
+                    //   baseData['id'],
+                    //   baseData['name'],
+                    //   baseData['publicKey'],
+                    //   baseData['relayServer'],
+                    //   baseData['version'] ?? "2",
+                    // );
                   } catch (e) {}
                   return NavigationActionPolicy.CANCEL;
                 }
