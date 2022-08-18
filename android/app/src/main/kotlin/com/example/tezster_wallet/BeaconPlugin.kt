@@ -99,7 +99,16 @@ class BeaconPlugin(
         return TezosAccount(publicKey, accountAddress, network, client)
     }
 
-    @OptIn(DelicateCoroutinesApi::class)
+    fun pair(uri: String){
+        GlobalScope.launch {
+            try {
+                beaconClient?.pair(uri);
+            }catch (e:Exception){
+                print(e);
+            }
+        }
+    }
+
     fun addPeer(
         id: String,
         name: String,
@@ -115,7 +124,6 @@ class BeaconPlugin(
             version = version
         )
         Log.i("Data", "peer adding..")
-        // runBlocking { beaconClient?.addPeers(peer) }
         GlobalScope.launch {
             try {
                 beaconClient?.addPeers(peer)
@@ -125,8 +133,6 @@ class BeaconPlugin(
             }
         }
         Log.i("Data", "peer adding after line..")
-        // checkForPeers()
-
     }
 
     private fun checkForPeers() {

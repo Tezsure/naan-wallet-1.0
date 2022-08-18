@@ -80,6 +80,12 @@ class MainActivity : FlutterFragmentActivity() {
 //                    Log.d(TAG, call.arguments.toString())
                     result.success(1)
                 }
+                "pair" -> {
+                    val uri: String? = call.argument<String>("uri")
+                    thread {
+                        beaconPlugin?.pair(uri!!);
+                    }
+                }
                 "respond" -> {
                     thread {
                         beaconPlugin?.respondExample(
