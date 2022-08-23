@@ -65,6 +65,18 @@ class BeaconController {
         }
     }
     
+    func pair(uri: String){
+        self.client?.pair(with: uri) { result in
+            switch result {
+            case .success(_):
+                print("Peer added")
+                break
+            case let .failure(error):
+                print("Could not add the peer, got error: \(error)")
+                break
+            }
+        }
+    }
     
     private func checkForPeers() {
         
@@ -73,22 +85,22 @@ class BeaconController {
     
     var allPeers: [Beacon.P2PPeer] = []
     
-    func resumeListing(){
-        self.allPeers.forEach {
-            peer in
-            self.client?.add([.p2p(peer)]) { result in
-                switch result {
-                case .success(_):
-                    print("Peer added")
-                    break
-                case let .failure(error):
-                    print("Could not add the peer, got error: \(error)")
-                    break
-                }
-            }
-        }
-        self.allPeers = []
-    }
+//    func resumeListing(){
+//        self.allPeers.forEach {
+//            peer in
+//            self.client?.add([.p2p(peer)]) { result in
+//                switch result {
+//                case .success(_):
+//                    print("Peer added")
+//                    break
+//                case let .failure(error):
+//                    print("Could not add the peer, got error: \(error)")
+//                    break
+//                }
+//            }
+//        }
+//        self.allPeers = []
+//    }
     
     
     func listenForRequests(onMessage: @escaping ((Data)->())) {
@@ -201,19 +213,19 @@ extension BeaconRequest: Encodable {
         case unsupportedBlockchain
     }
     
-//    public func encode(to encoder: Encoder) throws {
-//        switch self {
-//        case let .permission(content):
-//            try content.encode(to: encoder)
-//        case let .blockchain(blockchain):
-//            switch blockchain {
-//            case let .operation(content):
-//                try content.encode(to: encoder)
-//            case let .signPayload(content):
-//                try content.encode(to: encoder)
-//            case let .broadcast(content):
-//                try content.encode(to: encoder)
-//            }
-//        }
-//    }
+    //    public func encode(to encoder: Encoder) throws {
+    //        switch self {
+    //        case let .permission(content):
+    //            try content.encode(to: encoder)
+    //        case let .blockchain(blockchain):
+    //            switch blockchain {
+    //            case let .operation(content):
+    //                try content.encode(to: encoder)
+    //            case let .signPayload(content):
+    //                try content.encode(to: encoder)
+    //            case let .broadcast(content):
+    //                try content.encode(to: encoder)
+    //            }
+    //        }
+    //    }
 }
