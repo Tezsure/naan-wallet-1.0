@@ -107,7 +107,8 @@ pod update // In your ios project directory
 ## Naan device compatibility report for Dapp Browser
 
 - Click here to view [doc](https://docs.google.com/spreadsheets/d/1_YM3T2tcfbEkr9upE3RgxicZQLstixKaCu5P177XW3Q/edit?usp=sharing)
-  ![Naan device compatibility report for Dapp Browser](naan_device_compatibility_report.png)
+  ![Naan device compatibility report for Dapp Browser android](naan_device_compatibility_report_android.png)
+  ![Naan device compatibility report for Dapp Browser ios](naan_device_compatibility_report_ios.png)
 
 ## Naan wallet testcase scenarios.
 - Click here to view [doc](https://docs.google.com/spreadsheets/d/1PgiDEE6Le2kG7MtyD7SPV-0khhxqDnjdLVzIXqmf2MQ/edit?usp=sharing)
