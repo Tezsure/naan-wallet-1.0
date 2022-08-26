@@ -458,7 +458,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.2.37;
+				MARKETING_VERSION = 0.2.38;
 				PRODUCT_BUNDLE_IDENTIFIER = com.naan;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "Runner/Runner-Bridging-Header.h";
@@ -602,7 +602,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.2.37;
+				MARKETING_VERSION = 0.2.38;
 				PRODUCT_BUNDLE_IDENTIFIER = com.naan;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "Runner/Runner-Bridging-Header.h";
@@ -629,7 +629,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.2.37;
+				MARKETING_VERSION = 0.2.38;
 				PRODUCT_BUNDLE_IDENTIFIER = com.naan;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "Runner/Runner-Bridging-Header.h";
@@ -669,7 +669,7 @@
 			repositoryURL = "https://github.com/airgap-it/beacon-ios-sdk";
 			requirement = {
 				kind = exactVersion;
-				version = "3.2.1-beta.1";
+				version = 3.2.1;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */

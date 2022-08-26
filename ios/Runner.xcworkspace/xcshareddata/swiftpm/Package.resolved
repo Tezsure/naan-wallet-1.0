@@ -15,8 +15,8 @@
         "repositoryURL": "https://github.com/airgap-it/beacon-ios-sdk",
         "state": {
           "branch": null,
-          "revision": "6fe7561c74d4c69ee8c2cc8ef620b1a714ee4c7a",
-          "version": "3.2.1-beta.1"
+          "revision": "c63f976ff2eab2e99714f7ffd6b6a0021a48eaed",
+          "version": "3.2.1"
         }
       },
       {

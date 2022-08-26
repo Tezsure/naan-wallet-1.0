@@ -125,6 +125,7 @@ class _TxHistoryItemsViewState extends State<TxHistoryItemsView> {
           .where((e) =>
               e.parameter != null &&
               checkIfTokenIdSame(e.parameter, tokenModel.tokenId) &&
+              e.target != null &&
               (e.sender.address == tokenModel.contract ||
                   e.target.address == tokenModel.contract))
           .toList();
