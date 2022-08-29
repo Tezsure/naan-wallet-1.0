@@ -125,6 +125,14 @@ class DataHandlerController {
       'https://api.teztools.io',
       'token/prices',
     );
+    var xtzPriceResponse = await http_helper.HttpHelper.performGetRequest(
+        "https://api.coingecko.com",
+        "api/v3/simple/price?ids=tezos&vs_currencies=usd");
+
+    var xtzPrice = xtzPriceResponse['tezos']['usd'].toString();
+
+    DataHandlerController().priceData['xtzusdValue'] = double.parse(xtzPrice.toString());
+
     DataHandlerController().dollarValue.value =
         DataHandlerController().priceData['xtzusdValue'];
     await DataHandlerController().localStorage.write(
