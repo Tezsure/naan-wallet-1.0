@@ -10,6 +10,7 @@ import 'package:get/get.dart';
 import 'package:tezster_dart/tezster_dart.dart';
 import 'package:tezster_wallet/app/modules/common/colors_utils/colors.dart';
 import 'package:tezster_wallet/app/routes/app_pages.dart';
+import 'package:tezster_wallet/app/utils/storage_utils/storage_singleton.dart';
 import 'package:tezster_wallet/app/utils/storage_utils/storage_utils.dart';
 import 'package:tezster_wallet/models/beacon_permission_model.dart';
 import 'package:uni_links/uni_links.dart';
@@ -205,11 +206,19 @@ class BeaconPlugin {
   static Future<void> listenToChannle(callback) async {
     stream.receiveBroadcastStream().listen(callback);
     final initialUri = await getInitialUri();
-    parseLinkAndaddPeer(initialUri.toString());
+    if (initialUri.toString().startsWith("fxhash")) {
+      parseLinkAndaddPeer(initialUri.toString());
+    } else {
+      StorageSingleton().isFxHashFlow = true;
+    }
 
     _sub = linkStream.listen((String link) async {
       print(link);
-      parseLinkAndaddPeer(link);
+      if (link.toString().startsWith("fxhash")) {
+        parseLinkAndaddPeer(link);
+      } else {
+        StorageSingleton().isFxHashFlow = true;
+      }
     }, onError: (err) {
       print(err.toString());
     });

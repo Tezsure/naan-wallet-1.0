@@ -14,5 +14,7 @@ class StorageSingleton {
   String currentSelectedNetwork = "";
   bool isTestNetSelected;
 
+  bool isFxHashFlow = false;
+
   updateStorage(StorageModel model) => this.storage = model;
 }

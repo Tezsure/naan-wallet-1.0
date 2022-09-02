@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:get/get.dart';
 import 'package:tezster_wallet/app/modules/home_page/controllers/home_page_controller.dart';
+import 'package:tezster_wallet/app/utils/storage_utils/storage_singleton.dart';
 import 'package:tezster_wallet/beacon/beacon_plugin.dart';
 
 class DappWidget extends StatefulWidget {
@@ -22,7 +23,8 @@ class _DappWidgetState extends State<DappWidget>
     with AutomaticKeepAliveClientMixin<DappWidget> {
   final GlobalKey webViewKey = GlobalKey();
 
-  InAppWebViewController webViewController;
+  HomePageController controller;
+
   bool canGoBack, canGoForward;
   InAppWebViewGroupOptions options = InAppWebViewGroupOptions(
       crossPlatform: InAppWebViewOptions(
@@ -46,6 +48,7 @@ class _DappWidgetState extends State<DappWidget>
   @override
   void initState() {
     super.initState();
+    controller = widget.controller;
     canGoBack = false;
     canGoForward = false;
     contextMenu = ContextMenu(
@@ -56,15 +59,15 @@ class _DappWidgetState extends State<DappWidget>
               title: "Special",
               action: () async {
                 print("Menu item Special clicked!");
-                print(await webViewController?.getSelectedText());
-                await webViewController?.clearFocus();
+                print(await controller.webViewController?.getSelectedText());
+                await controller.webViewController?.clearFocus();
               })
         ],
         options: ContextMenuOptions(hideDefaultSystemContextMenuItems: false),
         onCreateContextMenu: (hitTestResult) async {
           print("onCreateContextMenu");
           print(hitTestResult.extra);
-          print(await webViewController?.getSelectedText());
+          print(await controller.webViewController?.getSelectedText());
         },
         onHideContextMenu: () {
           print("onHideContextMenu");
@@ -85,10 +88,11 @@ class _DappWidgetState extends State<DappWidget>
       ),
       onRefresh: () async {
         if (Platform.isAndroid) {
-          webViewController?.reload();
+          controller.webViewController?.reload();
         } else if (Platform.isIOS) {
-          webViewController?.loadUrl(
-              urlRequest: URLRequest(url: await webViewController?.getUrl()));
+          controller.webViewController?.loadUrl(
+              urlRequest: URLRequest(
+                  url: await controller.webViewController?.getUrl()));
         }
       },
     );
@@ -96,8 +100,8 @@ class _DappWidgetState extends State<DappWidget>
   }
 
   void setCanGoBackForward() async {
-    canGoBack = await webViewController?.canGoBack() ?? false;
-    canGoForward = await webViewController?.canGoForward() ?? false;
+    canGoBack = await controller.webViewController?.canGoBack() ?? false;
+    canGoForward = await controller.webViewController?.canGoForward() ?? false;
     setState(() {});
   }
 
@@ -126,7 +130,7 @@ class _DappWidgetState extends State<DappWidget>
             GestureDetector(
               onTap: () {
                 setState(() {
-                  webViewController?.goBack();
+                  controller.webViewController?.goBack();
                 });
                 setCanGoBackForward();
               },
@@ -157,7 +161,7 @@ class _DappWidgetState extends State<DappWidget>
             GestureDetector(
               onTap: () {
                 setState(() {
-                  webViewController?.goForward();
+                  controller.webViewController?.goForward();
                 });
                 setCanGoBackForward();
               },
@@ -224,15 +228,15 @@ class _DappWidgetState extends State<DappWidget>
                             url = Uri.parse(
                                 "https://www.google.com/search?q=" + value);
                           }
-                          webViewController?.loadUrl(
-                              urlRequest: URLRequest(url: url));
+                          controller.webViewController
+                              ?.loadUrl(urlRequest: URLRequest(url: url));
                         },
                       ),
                     ),
                     GestureDetector(
                       onTap: () {
                         setState(() {
-                          webViewController?.reload();
+                          controller.webViewController?.reload();
                         });
                       },
                       child: Container(
@@ -257,7 +261,7 @@ class _DappWidgetState extends State<DappWidget>
             GestureDetector(
               onTap: () {
                 setState(() {
-                  webViewController?.loadUrl(
+                  controller.webViewController?.loadUrl(
                       urlRequest: URLRequest(
                     url: Uri.parse(
                       'https://www.naanwallet.com/dapp.html',
@@ -286,8 +290,8 @@ class _DappWidgetState extends State<DappWidget>
               initialOptions: options,
 
               pullToRefreshController: pullToRefreshController,
-              onWebViewCreated: (controller) {
-                webViewController = controller;
+              onWebViewCreated: (webViewcontroller) {
+                controller.webViewController = webViewcontroller;
               },
 
               onLoadStart: (controller, url) {
@@ -365,4 +369,15 @@ class _DappWidgetState extends State<DappWidget>
       ),
     ])));
   }
+
+  // Uri getDefaultUrl() {
+  //   if (StorageSingleton().isFxHashFlow) {
+  //     StorageSingleton().isFxHashFlow = false;
+  //     return Uri.parse("https://www.fxhash.xyz");
+  //   } else {
+  //     return Uri.parse(
+  //       'https://www.naanwallet.com/dapp.html',
+  //     );
+  //   }
+  // }
 }
