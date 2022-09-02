@@ -207,17 +207,17 @@ class BeaconPlugin {
     stream.receiveBroadcastStream().listen(callback);
     final initialUri = await getInitialUri();
     if (initialUri.toString().startsWith("fxhash")) {
-      parseLinkAndaddPeer(initialUri.toString());
-    } else {
       StorageSingleton().isFxHashFlow = true;
+    } else {
+      parseLinkAndaddPeer(initialUri.toString());
     }
 
     _sub = linkStream.listen((String link) async {
       print(link);
       if (link.toString().startsWith("fxhash")) {
-        parseLinkAndaddPeer(link);
-      } else {
         StorageSingleton().isFxHashFlow = true;
+      } else {
+        parseLinkAndaddPeer(link);
       }
     }, onError: (err) {
       print(err.toString());
