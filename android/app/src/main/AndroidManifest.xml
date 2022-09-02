@@ -30,6 +30,7 @@
 				<category android:name="android.intent.category.DEFAULT" />
 				<category android:name="android.intent.category.BROWSABLE" />
 				<data android:scheme="tezos" />
+				<data android:scheme="fxhash" />
 			</intent-filter>
 
 			<meta-data android:name="io.flutter.embedding.android.SplashScreenDrawable" android:resource="@drawable/launch_background" />

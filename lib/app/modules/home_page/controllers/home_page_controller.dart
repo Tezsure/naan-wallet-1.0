@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/animation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:get/get.dart';
 import 'package:simple_gql/simple_gql.dart';
 import 'package:tezster_dart/tezster_dart.dart';
@@ -23,6 +24,7 @@ class HomePageController extends GetxController {
 
   AnimationController animController;
   Animation<double> animation;
+  InAppWebViewController webViewController;
 
   var priceData = {}.obs;
   var publicKeyHash = "".obs;

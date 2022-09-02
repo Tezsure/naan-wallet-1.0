@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:clay_containers/clay_containers.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_svg/svg.dart';
 
 import 'package:get/get.dart';
@@ -11,6 +12,8 @@ import 'package:tezster_wallet/app/modules/home_page/views/commonWidget/widgets.
 import 'package:tezster_wallet/app/modules/home_page/views/dapp/dapp_widget.dart';
 import 'package:tezster_wallet/app/modules/home_page/views/nft/nft_view.dart';
 import 'package:tezster_wallet/app/modules/home_page/views/wallet_page/wallet_page_view.dart';
+import 'package:tezster_wallet/app/utils/storage_utils/storage_singleton.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../controllers/home_page_controller.dart';
 import 'settings_page/settings_page_view.dart';
@@ -29,6 +32,23 @@ class HomePageView extends GetView<HomePageController> {
       }
     });
     CommonFunction.setSystemNavigatinColor(backgroundColor);
+
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
+      if (StorageSingleton().isFxHashFlow) {
+        controller.isWertLaunched.value = true;
+        String url =
+            "https://dev.api.tezsure.com/v1/tezsure/wert/index.html?address=${controller.storage.accounts[controller.storage.provider][controller.storage.currentAccountIndex]['publicKeyHash']}";
+        if (await canLaunch(url)) {
+          await launch(url).then((value) {
+            controller.isWertLaunched.value = false;
+            controller.webViewController.loadUrl(
+                urlRequest:
+                    URLRequest(url: Uri.parse("https://www.fxhash.xyz")));
+            controller.index.value = 3;
+          });
+        }
+      }
+    });
 
     List<Widget> _bottomNavigationWidget = [
       WalletPageView(
