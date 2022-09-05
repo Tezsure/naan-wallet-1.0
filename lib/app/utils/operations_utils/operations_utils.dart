@@ -73,6 +73,7 @@ class OperationUtils {
       [keyStore, rpc, tezsureApi, receiver, amount, network, usd]) async {
     var transactionSigner = await TezsterDart.createSigner(
         TezsterDart.writeKeyWithHint(keyStore.secretKey, 'edsk'));
+
     var transactionResult = await TezsterDart.sendTransactionOperation(
       rpc,
       transactionSigner,
@@ -133,7 +134,7 @@ class OperationUtils {
       100000,
       ['transfer'],
       [parameters],
-      codeFormat: TezosParameterFormat.Michelson,
+      codeFormat: TezosParameterFormat.Micheline,
     );
     //operationGroupID
     if (transactionResult['operationGroupID'] != '') {

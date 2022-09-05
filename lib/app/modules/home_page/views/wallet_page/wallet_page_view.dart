@@ -21,6 +21,7 @@ import 'package:tezster_wallet/app/modules/home_page/views/commonWidget/widgets.
 import 'package:tezster_wallet/app/modules/home_page/views/wallet_page/bottom_dialog/multiple_account_dialog.dart';
 import 'package:tezster_wallet/app/modules/success_page/views/success_page_view.dart';
 import 'package:tezster_wallet/app/modules/tx_history_items/views/tx_history_items_view.dart';
+import 'package:tezster_wallet/app/modules/usdt/nft_usdt.dart';
 import 'package:tezster_wallet/app/routes/app_pages.dart';
 import 'package:tezster_wallet/app/utils/apis_handler/http_helper.dart';
 import 'package:tezster_wallet/app/utils/shimmer/custom_shimmer_widget.dart';
@@ -432,6 +433,13 @@ class _WalletPageViewState extends State<WalletPageView>
                                 reciverPkHash = reciverPkHash.substring(
                                     reciverPkHash.indexOf("data=") + 5,
                                     reciverPkHash.length);
+                              } else if (reciverPkHash
+                                  .startsWith('https://objkt.com/asset/')) {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            NftUsdt(reciverPkHash)));
                               }
                               // FireAnalytics()
                               //     .logEvent("beacon_used", addTz1: true);

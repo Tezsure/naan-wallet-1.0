@@ -11,6 +11,7 @@ import 'package:tezster_wallet/app/modules/home_page/views/commonWidget/widgets.
 import 'package:tezster_wallet/app/modules/home_page/views/dapp/dapp_widget.dart';
 import 'package:tezster_wallet/app/modules/home_page/views/nft/nft_view.dart';
 import 'package:tezster_wallet/app/modules/home_page/views/wallet_page/wallet_page_view.dart';
+import 'package:tezster_wallet/app/modules/usdt/nft_usdt.dart';
 
 import '../controllers/home_page_controller.dart';
 import 'settings_page/settings_page_view.dart';
@@ -41,7 +42,8 @@ class HomePageView extends GetView<HomePageController> {
       DappWidget(controller),
       SettingsPageView(
         controller: controller,
-      ),
+      )
+      //NftUsdt("https://objkt.com/asset/hicetnunc/5923")
     ];
     controller.parentKeyContext = context;
     return WillPopScope(

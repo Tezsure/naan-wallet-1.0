@@ -52,6 +52,7 @@ dependencies:
   firebase_analytics: ^8.3.4
   shimmer: ^2.0.0
   share_plus: 2.0.0
+  simple_speed_dial: ^0.1.7
 
 dependency_overrides:
   firebase_crashlytics_platform_interface: 3.1.13
