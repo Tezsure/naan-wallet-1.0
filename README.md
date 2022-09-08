@@ -10,6 +10,7 @@ Features:
 4. NFT gallery
 5. Import NFT galley using publicKey
 6. Delegation to bakers
+7. Testnet support (Tokens are not displayed due to dependency on Teztools.io which only supports mainnet)
 
 ## Getting Started
 
