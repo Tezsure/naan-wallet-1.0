@@ -1,4 +1,3 @@
-import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:get/get.dart';
 import 'package:tezster_wallet/app/routes/app_pages.dart';
 import 'package:tezster_wallet/app/utils/storage_utils/storage_singleton.dart';
@@ -19,6 +18,7 @@ class SplashPageController extends GetxController {
     if (initialUri.toString().startsWith("fxhash://")) {
       print("Fxhash flow");
       StorageSingleton().isFxHashFlow = true;
+      StorageSingleton().eventUri = initialUri.toString().substring(9);
     }
     StorageUtils().init().then((isUserLogedIn) {
       isUserLogedIn = isUserLogedIn ?? false;
