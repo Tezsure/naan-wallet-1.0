@@ -20,6 +20,15 @@ class SplashPageController extends GetxController {
       StorageSingleton().isFxHashFlow = true;
       StorageSingleton().eventUri = initialUri.toString().substring(9);
     }
+    linkStream.listen((String link) async {
+      print(link);
+      if (link.toString().startsWith("fxhash")) {
+        StorageSingleton().isFxHashFlow = true;
+        StorageSingleton().eventUri = link.toString().substring(9);
+      }
+    }, onError: (err) {
+      print(err.toString());
+    });
     StorageUtils().init().then((isUserLogedIn) {
       isUserLogedIn = isUserLogedIn ?? false;
       if (isUserLogedIn)

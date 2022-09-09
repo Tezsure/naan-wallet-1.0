@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:get/get.dart';
 import 'package:tezster_wallet/app/modules/home_page/controllers/home_page_controller.dart';
+import 'package:tezster_wallet/app/utils/storage_utils/storage_model.dart';
 import 'package:tezster_wallet/app/utils/storage_utils/storage_singleton.dart';
 import 'package:tezster_wallet/beacon/beacon_plugin.dart';
 
@@ -262,11 +263,13 @@ class _DappWidgetState extends State<DappWidget>
               onTap: () {
                 setState(() {
                   controller.webViewController?.loadUrl(
-                      urlRequest: URLRequest(
-                    url: Uri.parse(
-                      'https://www.naanwallet.com/dapp.html',
-                    ),
-                  ));
+                      urlRequest: URLRequest(url: getDefaultUrl()
+                          //  StorageSingleton().isFxHashFlow
+                          //     ? Uri.parse(StorageSingleton().eventUri)
+                          //     : Uri.parse(
+                          //         'https://www.naanwallet.com/dapp.html',
+                          //       ),
+                          ));
                 });
                 setCanGoBackForward();
               },
@@ -370,14 +373,14 @@ class _DappWidgetState extends State<DappWidget>
     ])));
   }
 
-  // Uri getDefaultUrl() {
-  //   if (StorageSingleton().isFxHashFlow) {
-  //     StorageSingleton().isFxHashFlow = false;
-  //     return Uri.parse("https://www.fxhash.xyz");
-  //   } else {
-  //     return Uri.parse(
-  //       'https://www.naanwallet.com/dapp.html',
-  //     );
-  //   }
-  // }
+  Uri getDefaultUrl() {
+    if (StorageSingleton().isFxHashFlow) {
+      StorageSingleton().isFxHashFlow = false;
+      return Uri.parse(StorageSingleton().eventUri);
+    } else {
+      return Uri.parse(
+        'https://www.naanwallet.com/dapp.html',
+      );
+    }
+  }
 }
