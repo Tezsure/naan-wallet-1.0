@@ -208,6 +208,7 @@ class BeaconPlugin {
     final initialUri = await getInitialUri();
     if (initialUri.toString().startsWith("fxhash")) {
       StorageSingleton().isFxHashFlow = true;
+      StorageSingleton().eventUri = initialUri.toString().substring(9);
     } else {
       parseLinkAndaddPeer(initialUri.toString());
     }
@@ -216,6 +217,7 @@ class BeaconPlugin {
       print(link);
       if (link.toString().startsWith("fxhash")) {
         StorageSingleton().isFxHashFlow = true;
+        StorageSingleton().eventUri = initialUri.toString().substring(9);
       } else {
         parseLinkAndaddPeer(link);
       }

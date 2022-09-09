@@ -43,7 +43,7 @@ class HomePageView extends GetView<HomePageController> {
             controller.isWertLaunched.value = false;
             controller.webViewController.loadUrl(
                 urlRequest:
-                    URLRequest(url: Uri.parse("https://www.fxhash.xyz")));
+                    URLRequest(url: Uri.parse(StorageSingleton().eventUri)));
             controller.index.value = 3;
           });
         }
