@@ -32,24 +32,6 @@ class HomePageView extends GetView<HomePageController> {
       }
     });
     CommonFunction.setSystemNavigatinColor(backgroundColor);
-
-    WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
-      if (StorageSingleton().isFxHashFlow) {
-        controller.isWertLaunched.value = true;
-        String url =
-            "https://dev.api.tezsure.com/v1/tezsure/wert/index.html?address=${controller.storage.accounts[controller.storage.provider][controller.storage.currentAccountIndex]['publicKeyHash']}";
-        if (await canLaunch(url)) {
-          await launch(url).then((value) {
-            controller.isWertLaunched.value = false;
-            controller.webViewController.loadUrl(
-                urlRequest:
-                    URLRequest(url: Uri.parse(StorageSingleton().eventUri)));
-            controller.index.value = 3;
-          });
-        }
-      }
-    });
-
     List<Widget> _bottomNavigationWidget = [
       WalletPageView(
         controller: controller,
@@ -63,6 +45,31 @@ class HomePageView extends GetView<HomePageController> {
         controller: controller,
       ),
     ];
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
+      if (StorageSingleton().isFxHashFlow) {
+        controller.isWertLaunched.value = true;
+        String url =
+            "https://dev.api.tezsure.com/v1/tezsure/wert/index.html?address=${controller.storage.accounts[controller.storage.provider][controller.storage.currentAccountIndex]['publicKeyHash']}";
+        if (await canLaunch(url)) {
+          await launch(url).then((value) {
+            controller.isWertLaunched.value = false;
+            _bottomNavigationWidget[3] = DappWidget(controller);
+            controller.index.value = 3;
+            try {
+              controller.webViewController.loadUrl(
+                  urlRequest: URLRequest(
+                      url: Uri.parse(Platform.isIOS
+                          ? "https://" + StorageSingleton().eventUri
+                          : StorageSingleton().eventUri),
+                      iosAllowsExpensiveNetworkAccess: true));
+            } catch (e) {
+              print(e.toString());
+            }
+          });
+        }
+      }
+    });
+
     controller.parentKeyContext = context;
     return WillPopScope(
       onWillPop: () async {

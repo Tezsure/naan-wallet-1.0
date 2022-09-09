@@ -6,7 +6,8 @@ import 'package:tezster_wallet/app/modules/common/widgets/gradient_text.dart';
 
 import '../controllers/splash_page_controller.dart';
 
-class SplashPageView extends GetView<SplashPageController> {
+class SplashPageView extends GetView<SplashPageController> {  
+
   @override
   Widget build(BuildContext context) {
     controller.checkAccounts();
