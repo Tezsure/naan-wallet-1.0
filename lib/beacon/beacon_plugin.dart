@@ -5,15 +5,18 @@ import 'dart:io';
 import 'package:bs58check/bs58check.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:tezster_dart/tezster_dart.dart';
 import 'package:tezster_wallet/app/modules/common/colors_utils/colors.dart';
+import 'package:tezster_wallet/app/modules/home_page/controllers/home_page_controller.dart';
 import 'package:tezster_wallet/app/routes/app_pages.dart';
 import 'package:tezster_wallet/app/utils/storage_utils/storage_singleton.dart';
 import 'package:tezster_wallet/app/utils/storage_utils/storage_utils.dart';
 import 'package:tezster_wallet/models/beacon_permission_model.dart';
 import 'package:uni_links/uni_links.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class BeaconPlugin {
   static var opPair = <String, Object>{}.obs;
@@ -218,12 +221,38 @@ class BeaconPlugin {
       if (link.toString().startsWith("fxhash")) {
         StorageSingleton().isFxHashFlow = true;
         StorageSingleton().eventUri = link.toString().substring(9);
+        if (Get.currentRoute == Routes.HOME_PAGE) {
+          openDeepLinkFlow();
+        }
       } else {
         parseLinkAndaddPeer(link);
       }
     }, onError: (err) {
       print(err.toString());
     });
+  }
+
+  static openDeepLinkFlow() async {
+    var controller = Get.find<HomePageController>();
+    controller.isWertLaunched.value = true;
+    String url =
+        "https://dev.api.tezsure.com/v1/tezsure/wert/index.html?address=${controller.storage.accounts[controller.storage.provider][controller.storage.currentAccountIndex]['publicKeyHash']}";
+    if (await canLaunch(url)) {
+      await launch(url).then((value) {
+        controller.isWertLaunched.value = false;
+        controller.index.value = 3;
+        try {
+          controller.webViewController.loadUrl(
+              urlRequest: URLRequest(
+                  url: Uri.parse(Platform.isIOS
+                      ? "https://" + StorageSingleton().eventUri
+                      : StorageSingleton().eventUri),
+                  iosAllowsExpensiveNetworkAccess: true));
+        } catch (e) {
+          print(e.toString());
+        }
+      });
+    }
   }
 
   static parseLinkAndaddPeer(String link) async {
