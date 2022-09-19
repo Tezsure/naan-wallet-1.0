@@ -139,25 +139,25 @@ class _NftUsdtState extends State<NftUsdt> {
       var transactionSigner = await TezsterDart.createSigner(
           TezsterDart.writeKeyWithHint(keyStore.secretKey, 'edsk'));
       String priceInUSDT =
-          (((int.parse(nft.lowestAsk) / 1e6) * tezPrice) * 1.05).toString();
+          (((int.parse(nft.lowestAsk) / 1e6) * tezPrice) * 1.1).toString();
       var transactionResult = await TezsterDart.sendContractInvocationOperation(
         "https://mainnet.smartpy.io",
         transactionSigner,
         keyStore,
         [
           "KT1XnTn74bUtxHfDtBmm2bGZAQfhPbvKWR8o",
-          "KT1MEVCrGRCsoERXf6ahNLC4ik6J2vRH7Mm6",
-          "KT1WvzYHCNBvDSdwafTHv7nJ1dWmZ8GCYuuC"
+          "KT1JoZgGSgiW4xWLMRgcN1GgqZNwCHsxkjQ4",
         ],
-        [0, 0, int.parse(nft.lowestAsk)],
+        [0, 0],
         120000,
         1000,
         100000,
-        ['transfer', 'routerSwap', 'fulfill_ask'],
+        ['transfer', 'routerSwap'],
         [
-          """[ { "prim": "Pair", "args": [ { "string": "${keyStore.publicKeyHash}" }, [ { "prim": "Pair", "args": [ { "string": "KT1MEVCrGRCsoERXf6ahNLC4ik6J2vRH7Mm6" }, { "prim": "Pair", "args": [ { "int": "0" }, { "int": "${(double.parse(priceInUSDT) * 1e6).toStringAsFixed(0)}" } ] } ] } ] ] } ]""",
-          """{ "prim": "Pair", "args": [ [ { "prim": "Elt", "args": [ { "int": "0" }, { "prim": "Pair", "args": [ { "prim": "Pair", "args": [ { "string": "KT1D1NcffeDR3xQ75fUFoJXZzD6WQp96Je3L" }, { "int": "0" } ] }, { "prim": "Pair", "args": [ { "string": "KT1SjXiUX63QvdNMcM2m492f7kuf8JxXRLp4" }, { "int": "0" } ] } ] } ] }, { "prim": "Elt", "args": [ { "int": "1" }, { "prim": "Pair", "args": [ { "prim": "Pair", "args": [ { "string": "KT1CAYNQGvYSF5UvHK21grMrKpe2563w9UcX" }, { "int": "${nft.lowestAsk}" } ] }, { "prim": "Pair", "args": [ { "string": "KT1BG1oEqQckYBRBCyaAcq1iQXkp8PVXhSVr" }, { "int": "0" } ] } ] } ] } ], { "prim": "Pair", "args": [ { "int": "${(double.parse(priceInUSDT) * 1e6).toStringAsFixed(0)}" }, { "string": "${keyStore.publicKeyHash}" } ] } ] }""",
-          """{ "prim": "Pair", "args": [ { "int": "${nft.buyId}" }, { "prim": "None" } ] }"""
+          """[ { "prim": "Pair", "args": [ { "string": "${keyStore.publicKeyHash}" }, [ { "prim": "Pair", "args": [ { "string": "KT1JoZgGSgiW4xWLMRgcN1GgqZNwCHsxkjQ4" }, { "prim": "Pair", "args": [ { "int": "0" }, { "int": "${(double.parse(priceInUSDT) * 1e6).toStringAsFixed(0)}" } ] } ] } ] ] } ]""",
+          //"""{ "prim": "Pair", "args": [ [ { "prim": "Elt", "args": [ { "int": "0" }, { "prim": "Pair", "args": [ { "prim": "Pair", "args": [ { "string": "KT1D1NcffeDR3xQ75fUFoJXZzD6WQp96Je3L" }, { "int": "0" } ] }, { "prim": "Pair", "args": [ { "string": "KT1SjXiUX63QvdNMcM2m492f7kuf8JxXRLp4" }, { "int": "0" } ] } ] } ] }, { "prim": "Elt", "args": [ { "int": "1" }, { "prim": "Pair", "args": [ { "prim": "Pair", "args": [ { "string": "KT1CAYNQGvYSF5UvHK21grMrKpe2563w9UcX" }, { "int": "${nft.lowestAsk}" } ] }, { "prim": "Pair", "args": [ { "string": "KT1BG1oEqQckYBRBCyaAcq1iQXkp8PVXhSVr" }, { "int": "0" } ] } ] } ] } ], { "prim": "Pair", "args": [ { "int": "${(double.parse(priceInUSDT) * 1e6).toStringAsFixed(0)}" }, { "string": "${keyStore.publicKeyHash}" } ] } ] }""",
+          """{ "prim": "Pair", "args": [ { "prim": "Pair", "args": [ [ { "prim": "Elt", "args": [ { "int": "0" }, { "prim": "Pair", "args": [ { "prim": "Pair", "args": [ { "string": "KT1D1NcffeDR3xQ75fUFoJXZzD6WQp96Je3L" }, { "int": "0" } ] }, { "prim": "Pair", "args": [ { "string": "KT1SjXiUX63QvdNMcM2m492f7kuf8JxXRLp4" }, { "int": "0" } ] } ] } ] }, { "prim": "Elt", "args": [ { "int": "1" }, { "prim": "Pair", "args": [ { "prim": "Pair", "args": [ { "string": "KT1CAYNQGvYSF5UvHK21grMrKpe2563w9UcX" }, { "int": "${nft.lowestAsk}" } ] }, { "prim": "Pair", "args": [ { "string": "KT1BG1oEqQckYBRBCyaAcq1iQXkp8PVXhSVr" }, { "int": "0" } ] } ] } ] } ], { "int": "${(double.parse(priceInUSDT) * 1e6).toStringAsFixed(0)}" } ] }, { "prim": "Pair", "args": [ { "int": "${nft.buyId}" }, { "prim": "Pair", "args": [ { "int": "${nft.lowestAsk}" }, { "string": "${keyStore.publicKeyHash}" } ] } ] } ] }"""
+          //"""{ "prim": "Pair", "args": [ { "int": "${nft.buyId}" }, { "prim": "None" } ] }"""
         ],
         codeFormat: TezosParameterFormat.Micheline,
       );
