@@ -134,7 +134,7 @@ class _DappWidgetState extends State<DappWidget>
                       Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => NftUsdt(url)));
+                              builder: (context) => NftUsdt(url, "USDt")));
                     },
                     closeSpeedDialOnPressed: false,
                   ),
@@ -143,15 +143,49 @@ class _DappWidgetState extends State<DappWidget>
                     foregroundColor: Colors.black,
                     backgroundColor: Colors.teal,
                     label: 'Buy using kUSD',
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => NftUsdt(url, "kUSD")));
+                    },
                   ),
 
                   SpeedDialChild(
                     child: Icon(Icons.access_alarm_rounded),
                     foregroundColor: Colors.black,
                     backgroundColor: Colors.blue[700],
-                    label: 'Buy using USDC.e',
-                    onPressed: () {},
+                    label: 'Buy using uUSD',
+                    onPressed: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => NftUsdt(url, "uUSD")));
+                    },
+                  ),
+                  SpeedDialChild(
+                    child: Icon(Icons.zoom_out),
+                    foregroundColor: Colors.black,
+                    backgroundColor: Colors.pink[700],
+                    label: 'Buy using EURL',
+                    onPressed: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => NftUsdt(url, "EURL")));
+                    },
+                  ),
+                  SpeedDialChild(
+                    child: Icon(Icons.radio_button_on),
+                    foregroundColor: Colors.black,
+                    backgroundColor: Colors.orangeAccent[700],
+                    label: 'Buy using ctez',
+                    onPressed: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => NftUsdt(url, "ctez")));
+                    },
                   ),
                   //  Your other SpeedDialChildren go here.
                 ],

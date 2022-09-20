@@ -439,7 +439,7 @@ class _WalletPageViewState extends State<WalletPageView>
                                     context,
                                     MaterialPageRoute(
                                         builder: (context) =>
-                                            NftUsdt(reciverPkHash)));
+                                            NftUsdt(reciverPkHash, "USDt")));
                               }
                               // FireAnalytics()
                               //     .logEvent("beacon_used", addTz1: true);

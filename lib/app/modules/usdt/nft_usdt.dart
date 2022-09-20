@@ -1,4 +1,3 @@
-import 'dart:ffi';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -30,9 +29,10 @@ class NFT {
 // ignore: must_be_immutable
 class NftUsdt extends StatefulWidget {
   final String url;
+  final String token;
   String faContract;
   String tokenId;
-  NftUsdt(this.url) {
+  NftUsdt(this.url, this.token) {
     var mainUrl = url.replaceFirst("https://objkt.com/asset/", '').split("/");
     this.faContract = mainUrl[0];
     this.tokenId = mainUrl[1];
@@ -46,12 +46,15 @@ class _NftUsdtState extends State<NftUsdt> {
   NFT nft;
   double tezPrice = 0.0;
   bool loading = false;
+
   void getNFTdata() async {
     try {
       var price = (await http_helper.HttpHelper.performGetRequest(
           'https://networkanalyticsindexer.plentydefi.com',
           'analytics/tokens/tez'))[0]["price"]["value"];
-
+      var tokPrice = (await http_helper.HttpHelper.performGetRequest(
+          'https://networkanalyticsindexer.plentydefi.com',
+          'analytics/tokens/${widget.token}'))[0]["price"]["value"];
       var response;
       if (widget.faContract.startsWith('KT1')) {
         response = await GQLClient(
@@ -95,7 +98,7 @@ class _NftUsdtState extends State<NftUsdt> {
       print(response);
       WidgetsBinding.instance.addPostFrameCallback((_) {
         setState(() {
-          tezPrice = double.parse(price);
+          tezPrice = double.parse(price) / double.parse(tokPrice);
           nft = NFT(
               buyId: response.data["token"][0]["asks"][0]["id"].toString(),
               lowestAsk:
@@ -138,32 +141,137 @@ class _NftUsdtState extends State<NftUsdt> {
       );
       var transactionSigner = await TezsterDart.createSigner(
           TezsterDart.writeKeyWithHint(keyStore.secretKey, 'edsk'));
-      String priceInUSDT =
-          (((int.parse(nft.lowestAsk) / 1e6) * tezPrice) * 1.1).toString();
-      var transactionResult = await TezsterDart.sendContractInvocationOperation(
-        "https://mainnet.smartpy.io",
-        transactionSigner,
-        keyStore,
-        [
-          "KT1XnTn74bUtxHfDtBmm2bGZAQfhPbvKWR8o",
-          "KT1JoZgGSgiW4xWLMRgcN1GgqZNwCHsxkjQ4",
-        ],
-        [0, 0],
-        120000,
-        1000,
-        100000,
-        ['transfer', 'routerSwap'],
-        [
-          """[ { "prim": "Pair", "args": [ { "string": "${keyStore.publicKeyHash}" }, [ { "prim": "Pair", "args": [ { "string": "KT1JoZgGSgiW4xWLMRgcN1GgqZNwCHsxkjQ4" }, { "prim": "Pair", "args": [ { "int": "0" }, { "int": "${(double.parse(priceInUSDT) * 1e6).toStringAsFixed(0)}" } ] } ] } ] ] } ]""",
-          //"""{ "prim": "Pair", "args": [ [ { "prim": "Elt", "args": [ { "int": "0" }, { "prim": "Pair", "args": [ { "prim": "Pair", "args": [ { "string": "KT1D1NcffeDR3xQ75fUFoJXZzD6WQp96Je3L" }, { "int": "0" } ] }, { "prim": "Pair", "args": [ { "string": "KT1SjXiUX63QvdNMcM2m492f7kuf8JxXRLp4" }, { "int": "0" } ] } ] } ] }, { "prim": "Elt", "args": [ { "int": "1" }, { "prim": "Pair", "args": [ { "prim": "Pair", "args": [ { "string": "KT1CAYNQGvYSF5UvHK21grMrKpe2563w9UcX" }, { "int": "${nft.lowestAsk}" } ] }, { "prim": "Pair", "args": [ { "string": "KT1BG1oEqQckYBRBCyaAcq1iQXkp8PVXhSVr" }, { "int": "0" } ] } ] } ] } ], { "prim": "Pair", "args": [ { "int": "${(double.parse(priceInUSDT) * 1e6).toStringAsFixed(0)}" }, { "string": "${keyStore.publicKeyHash}" } ] } ] }""",
-          """{ "prim": "Pair", "args": [ { "prim": "Pair", "args": [ [ { "prim": "Elt", "args": [ { "int": "0" }, { "prim": "Pair", "args": [ { "prim": "Pair", "args": [ { "string": "KT1D1NcffeDR3xQ75fUFoJXZzD6WQp96Je3L" }, { "int": "0" } ] }, { "prim": "Pair", "args": [ { "string": "KT1SjXiUX63QvdNMcM2m492f7kuf8JxXRLp4" }, { "int": "0" } ] } ] } ] }, { "prim": "Elt", "args": [ { "int": "1" }, { "prim": "Pair", "args": [ { "prim": "Pair", "args": [ { "string": "KT1CAYNQGvYSF5UvHK21grMrKpe2563w9UcX" }, { "int": "${nft.lowestAsk}" } ] }, { "prim": "Pair", "args": [ { "string": "KT1BG1oEqQckYBRBCyaAcq1iQXkp8PVXhSVr" }, { "int": "0" } ] } ] } ] } ], { "int": "${(double.parse(priceInUSDT) * 1e6).toStringAsFixed(0)}" } ] }, { "prim": "Pair", "args": [ { "int": "${nft.buyId}" }, { "prim": "Pair", "args": [ { "int": "${nft.lowestAsk}" }, { "string": "${keyStore.publicKeyHash}" } ] } ] } ] }"""
-          //"""{ "prim": "Pair", "args": [ { "int": "${nft.buyId}" }, { "prim": "None" } ] }"""
-        ],
-        codeFormat: TezosParameterFormat.Micheline,
-      );
-      setState(() {
-        loading = false;
-      });
+      String priceInToken;
+      var transactionResult;
+      if (widget.token == "USDt") {
+        priceInToken =
+            (((int.parse(nft.lowestAsk) / 1e6) * tezPrice) * 1.1).toString();
+        transactionResult = await TezsterDart.sendContractInvocationOperation(
+          "https://mainnet.smartpy.io",
+          transactionSigner,
+          keyStore,
+          [
+            "KT1XnTn74bUtxHfDtBmm2bGZAQfhPbvKWR8o",
+            "KT1JoZgGSgiW4xWLMRgcN1GgqZNwCHsxkjQ4",
+          ],
+          [0, 0],
+          120000,
+          1000,
+          100000,
+          ['transfer', 'routerSwap'],
+          [
+            """[ { "prim": "Pair", "args": [ { "string": "${keyStore.publicKeyHash}" }, [ { "prim": "Pair", "args": [ { "string": "KT1JoZgGSgiW4xWLMRgcN1GgqZNwCHsxkjQ4" }, { "prim": "Pair", "args": [ { "int": "0" }, { "int": "${(double.parse(priceInToken) * 1e6).toStringAsFixed(0)}" } ] } ] } ] ] } ]""",
+            //"""{ "prim": "Pair", "args": [ [ { "prim": "Elt", "args": [ { "int": "0" }, { "prim": "Pair", "args": [ { "prim": "Pair", "args": [ { "string": "KT1D1NcffeDR3xQ75fUFoJXZzD6WQp96Je3L" }, { "int": "0" } ] }, { "prim": "Pair", "args": [ { "string": "KT1SjXiUX63QvdNMcM2m492f7kuf8JxXRLp4" }, { "int": "0" } ] } ] } ] }, { "prim": "Elt", "args": [ { "int": "1" }, { "prim": "Pair", "args": [ { "prim": "Pair", "args": [ { "string": "KT1CAYNQGvYSF5UvHK21grMrKpe2563w9UcX" }, { "int": "${nft.lowestAsk}" } ] }, { "prim": "Pair", "args": [ { "string": "KT1BG1oEqQckYBRBCyaAcq1iQXkp8PVXhSVr" }, { "int": "0" } ] } ] } ] } ], { "prim": "Pair", "args": [ { "int": "${(double.parse(priceInUSDT) * 1e6).toStringAsFixed(0)}" }, { "string": "${keyStore.publicKeyHash}" } ] } ] }""",
+            """{ "prim": "Pair", "args": [ { "prim": "Pair", "args": [ [ { "prim": "Elt", "args": [ { "int": "0" }, { "prim": "Pair", "args": [ { "prim": "Pair", "args": [ { "string": "KT1D1NcffeDR3xQ75fUFoJXZzD6WQp96Je3L" }, { "int": "0" } ] }, { "prim": "Pair", "args": [ { "string": "KT1SjXiUX63QvdNMcM2m492f7kuf8JxXRLp4" }, { "int": "0" } ] } ] } ] }, { "prim": "Elt", "args": [ { "int": "1" }, { "prim": "Pair", "args": [ { "prim": "Pair", "args": [ { "string": "KT1CAYNQGvYSF5UvHK21grMrKpe2563w9UcX" }, { "int": "${nft.lowestAsk}" } ] }, { "prim": "Pair", "args": [ { "string": "KT1BG1oEqQckYBRBCyaAcq1iQXkp8PVXhSVr" }, { "int": "0" } ] } ] } ] } ], { "int": "${(double.parse(priceInToken) * 1e6).toStringAsFixed(0)}" } ] }, { "prim": "Pair", "args": [ { "int": "${nft.buyId}" }, { "prim": "Pair", "args": [ { "int": "${nft.lowestAsk}" }, { "string": "${keyStore.publicKeyHash}" } ] } ] } ] }"""
+            //"""{ "prim": "Pair", "args": [ { "int": "${nft.buyId}" }, { "prim": "None" } ] }"""
+          ],
+          codeFormat: TezosParameterFormat.Micheline,
+        );
+        setState(() {
+          loading = false;
+        });
+      } else if (widget.token == "uUSD") {
+        priceInToken =
+            (((int.parse(nft.lowestAsk) / 1e6) * tezPrice) * 1.1).toString();
+        transactionResult = await TezsterDart.sendContractInvocationOperation(
+          "https://mainnet.smartpy.io",
+          transactionSigner,
+          keyStore,
+          [
+            "KT1XRPEPXbZK25r3Htzp2o1x7xdMMmfocKNW",
+            "KT1JoZgGSgiW4xWLMRgcN1GgqZNwCHsxkjQ4",
+          ],
+          [0, 0],
+          120000,
+          1000,
+          100000,
+          ['transfer', 'routerSwap'],
+          [
+            """[ { "prim": "Pair", "args": [ { "string": "${keyStore.publicKeyHash}" }, [ { "prim": "Pair", "args": [ { "string": "KT1JoZgGSgiW4xWLMRgcN1GgqZNwCHsxkjQ4" }, { "prim": "Pair", "args": [ { "int": "0" }, { "int": "${(double.parse(priceInToken) * 1e12).toStringAsFixed(0)}" } ] } ] } ] ] } ]""",
+            """{ "prim": "Pair", "args": [ { "prim": "Pair", "args": [ [ { "prim": "Elt", "args": [ { "int": "0" }, { "prim": "Pair", "args": [ { "prim": "Pair", "args": [ { "string": "KT1Ji4hVDeQ5Ru7GW1Tna9buYSs3AppHLwj9" }, { "int": "0" } ] }, { "prim": "Pair", "args": [ { "string": "KT1UsSfaXyqcjSVPeiD7U1bWgKy3taYN7NWY" }, { "int": "2" } ] } ] } ] }, { "prim": "Elt", "args": [ { "int": "1" }, { "prim": "Pair", "args": [ { "prim": "Pair", "args": [ { "string": "KT1Dhy1gVW3PSC9cms9QJ7xPMPPpip2V9aA6" }, { "int": "0" } ] }, { "prim": "Pair", "args": [ { "string": "KT1SjXiUX63QvdNMcM2m492f7kuf8JxXRLp4" }, { "int": "0" } ] } ] } ] }, { "prim": "Elt", "args": [ { "int": "2" }, { "prim": "Pair", "args": [ { "prim": "Pair", "args": [ { "string": "KT1CAYNQGvYSF5UvHK21grMrKpe2563w9UcX" }, { "int": "${nft.lowestAsk}" } ] }, { "prim": "Pair", "args": [ { "string": "KT1BG1oEqQckYBRBCyaAcq1iQXkp8PVXhSVr" }, { "int": "0" } ] } ] } ] } ], { "int": "${(double.parse(priceInToken) * 1e12).toStringAsFixed(0)}" } ] }, { "prim": "Pair", "args": [ { "int": "${nft.buyId}" }, { "prim": "Pair", "args": [ { "int": "${nft.lowestAsk}" }, { "string": "${keyStore.publicKeyHash}" } ] } ] } ] }"""
+          ],
+          codeFormat: TezosParameterFormat.Micheline,
+        );
+        setState(() {
+          loading = false;
+        });
+      } else if (widget.token == "kUSD") {
+        priceInToken =
+            (((int.parse(nft.lowestAsk) / 1e6) * tezPrice) * 1.1).toString();
+        transactionResult = await TezsterDart.sendContractInvocationOperation(
+          "https://mainnet.smartpy.io",
+          transactionSigner,
+          keyStore,
+          [
+            "KT1K9gCRgaLRFKTErYt1wVxA3Frb9FjasjTV",
+            "KT1JoZgGSgiW4xWLMRgcN1GgqZNwCHsxkjQ4",
+          ],
+          [0, 0],
+          120000,
+          1000,
+          100000,
+          ['transfer', 'routerSwap'],
+          [
+            """{ "prim": "Pair", "args": [ { "string": "${keyStore.publicKeyHash}" }, { "prim": "Pair", "args": [ { "string": "KT1JoZgGSgiW4xWLMRgcN1GgqZNwCHsxkjQ4" }, { "int": "${(double.parse(priceInToken) * 1e18).toStringAsFixed(0)}" } ] } ] }""",
+            """{ "prim": "Pair", "args": [ { "prim": "Pair", "args": [ [ { "prim": "Elt", "args": [ { "int": "0" }, { "prim": "Pair", "args": [ { "prim": "Pair", "args": [ { "string": "KT1HgFcDE8ZXNdT1aXXKpMbZc6GkUS2VHiPo" }, { "int": "0" } ] }, { "prim": "Pair", "args": [ { "string": "KT1UsSfaXyqcjSVPeiD7U1bWgKy3taYN7NWY" }, { "int": "2" } ] } ] } ] }, { "prim": "Elt", "args": [ { "int": "1" }, { "prim": "Pair", "args": [ { "prim": "Pair", "args": [ { "string": "KT1Dhy1gVW3PSC9cms9QJ7xPMPPpip2V9aA6" }, { "int": "0" } ] }, { "prim": "Pair", "args": [ { "string": "KT1SjXiUX63QvdNMcM2m492f7kuf8JxXRLp4" }, { "int": "0" } ] } ] } ] }, { "prim": "Elt", "args": [ { "int": "2" }, { "prim": "Pair", "args": [ { "prim": "Pair", "args": [ { "string": "KT1CAYNQGvYSF5UvHK21grMrKpe2563w9UcX" }, { "int": "${nft.lowestAsk}" } ] }, { "prim": "Pair", "args": [ { "string": "KT1BG1oEqQckYBRBCyaAcq1iQXkp8PVXhSVr" }, { "int": "0" } ] } ] } ] } ], { "int": "${(double.parse(priceInToken) * 1e18).toStringAsFixed(0)}" } ] }, { "prim": "Pair", "args": [ { "int": "${nft.buyId}" }, { "prim": "Pair", "args": [ { "int": "${nft.lowestAsk}" }, { "string": "${keyStore.publicKeyHash}" } ] } ] } ] }"""
+          ],
+          codeFormat: TezosParameterFormat.Micheline,
+        );
+        setState(() {
+          loading = false;
+        });
+      } else if (widget.token == "EURL") {
+        priceInToken =
+            (((int.parse(nft.lowestAsk) / 1e6) * tezPrice) * 1.1).toString();
+        transactionResult = await TezsterDart.sendContractInvocationOperation(
+          "https://mainnet.smartpy.io",
+          transactionSigner,
+          keyStore,
+          [
+            "KT1JBNFcB5tiycHNdYGYCtR3kk6JaJysUCi8",
+            "KT1JoZgGSgiW4xWLMRgcN1GgqZNwCHsxkjQ4",
+          ],
+          [0, 0],
+          120000,
+          1000,
+          100000,
+          ['transfer', 'routerSwap'],
+          [
+            """[ { "prim": "Pair", "args": [ { "string": "${keyStore.publicKeyHash}" }, [ { "prim": "Pair", "args": [ { "string": "KT1JoZgGSgiW4xWLMRgcN1GgqZNwCHsxkjQ4" }, { "prim": "Pair", "args": [ { "int": "0" }, { "int": "${(double.parse(priceInToken) * 1e6).toStringAsFixed(0)}" } ] } ] } ] ] } ]""",
+            """{ "prim": "Pair", "args": [ { "prim": "Pair", "args": [ [ { "prim": "Elt", "args": [ { "int": "0" }, { "prim": "Pair", "args": [ { "prim": "Pair", "args": [ { "string": "KT1LqEgLikLE2obnyzgPJA6vMtnnG5agXVCn" }, { "int": "0" } ] }, { "prim": "Pair", "args": [ { "string": "KT1SjXiUX63QvdNMcM2m492f7kuf8JxXRLp4" }, { "int": "0" } ] } ] } ] }, { "prim": "Elt", "args": [ { "int": "1" }, { "prim": "Pair", "args": [ { "prim": "Pair", "args": [ { "string": "KT1CAYNQGvYSF5UvHK21grMrKpe2563w9UcX" }, { "int": "${nft.lowestAsk}" } ] }, { "prim": "Pair", "args": [ { "string": "KT1BG1oEqQckYBRBCyaAcq1iQXkp8PVXhSVr" }, { "int": "0" } ] } ] } ] } ], { "int": "${(double.parse(priceInToken) * 1e6).toStringAsFixed(0)}" } ] }, { "prim": "Pair", "args": [ { "int": "${nft.buyId}" }, { "prim": "Pair", "args": [ { "int": "${nft.lowestAsk}" }, { "string": "${keyStore.publicKeyHash}" } ] } ] } ] }"""
+          ],
+          codeFormat: TezosParameterFormat.Micheline,
+        );
+        setState(() {
+          loading = false;
+        });
+      } else if (widget.token == "ctez") {
+        priceInToken =
+            (((int.parse(nft.lowestAsk) / 1e6) * tezPrice) * 1.1).toString();
+        transactionResult = await TezsterDart.sendContractInvocationOperation(
+          "https://mainnet.smartpy.io",
+          transactionSigner,
+          keyStore,
+          [
+            "KT1SjXiUX63QvdNMcM2m492f7kuf8JxXRLp4",
+            "KT1JoZgGSgiW4xWLMRgcN1GgqZNwCHsxkjQ4",
+          ],
+          [0, 0],
+          120000,
+          1000,
+          100000,
+          ['transfer', 'routerSwap'],
+          [
+            """{ "prim": "Pair", "args": [ { "string": "${keyStore.publicKeyHash}" }, { "prim": "Pair", "args": [ { "string": "KT1JoZgGSgiW4xWLMRgcN1GgqZNwCHsxkjQ4" }, { "int": "${(double.parse(priceInToken) * 1e6).toStringAsFixed(0)}" } ] } ] }""",
+            """{ "prim": "Pair", "args": [ { "prim": "Pair", "args": [ [ { "prim": "Elt", "args": [ { "int": "0" }, { "prim": "Pair", "args": [ { "prim": "Pair", "args": [ { "string": "KT1CAYNQGvYSF5UvHK21grMrKpe2563w9UcX" }, { "int": "${nft.lowestAsk}" } ] }, { "prim": "Pair", "args": [ { "string": "KT1BG1oEqQckYBRBCyaAcq1iQXkp8PVXhSVr" }, { "int": "0" } ] } ] } ] } ], { "int": "${(double.parse(priceInToken) * 1e6).toStringAsFixed(0)}" } ] }, { "prim": "Pair", "args": [ { "int": "${nft.buyId}" }, { "prim": "Pair", "args": [ { "int": "${nft.lowestAsk}" }, { "string": "${keyStore.publicKeyHash}" } ] } ] } ] }"""
+          ],
+          codeFormat: TezosParameterFormat.Micheline,
+        );
+        setState(() {
+          loading = false;
+        });
+      }
+
       print(transactionResult['operationGroupID']
           .toString()
           .replaceAll('\n', ''));
@@ -252,7 +360,7 @@ class _NftUsdtState extends State<NftUsdt> {
                                           MainAxisAlignment.center,
                                       children: [
                                         Text(
-                                            "Buy For ${(((int.parse(nft.lowestAsk) / 1e6) * tezPrice)).toStringAsFixed(2)} USDT (${(int.parse(nft.lowestAsk) / 1e6).toStringAsFixed(2)} tez)"),
+                                            "Buy For ${(((int.parse(nft.lowestAsk) / 1e6) * tezPrice * 1.1)).toStringAsFixed(2)} ${widget.token} (${(int.parse(nft.lowestAsk) / 1e6).toStringAsFixed(2)} tez)"),
                                         loading
                                             ? Padding(
                                                 padding:
