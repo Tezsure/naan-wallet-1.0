@@ -14,6 +14,7 @@ import 'package:tezster_wallet/app/modules/common/functions/common_functions.dar
 import 'package:tezster_wallet/app/modules/common/widgets/back_button.dart';
 import 'package:tezster_wallet/app/modules/common/widgets/gradient_icon.dart';
 import 'package:tezster_wallet/app/modules/home_page/controllers/home_page_controller.dart';
+import 'package:tezster_wallet/app/utils/storage_utils/storage_singleton.dart';
 import 'package:tezster_wallet/models/tokens_model.dart';
 import 'package:tezster_wallet/models/tzkt_txs_model.dart';
 
@@ -124,6 +125,7 @@ class _TxHistoryItemsViewState extends State<TxHistoryItemsView> {
           .where((e) =>
               e.parameter != null &&
               checkIfTokenIdSame(e.parameter, tokenModel.tokenId) &&
+              e.target != null &&
               (e.sender.address == tokenModel.contract ||
                   e.target.address == tokenModel.contract))
           .toList();
@@ -353,7 +355,9 @@ class _TxHistoryItemsViewState extends State<TxHistoryItemsView> {
                             return Column(
                               children: [
                                 Container(
-                                  height: 74,
+                                  constraints: BoxConstraints(
+                                    minHeight: 74,
+                                  ),
                                   decoration: BoxDecoration(
                                     color: Color(0xff1E1E1E),
                                     borderRadius: BorderRadius.all(
@@ -480,7 +484,11 @@ class _TxHistoryItemsViewState extends State<TxHistoryItemsView> {
                                                       onTap: () {
                                                         CommonFunction
                                                             .launchURL(
-                                                          "https://tzkt.io/${_model.hash}",
+                                                          StorageSingleton()
+                                                                  .currentSelectedNetwork
+                                                                  .isEmpty
+                                                              ? "https://tzkt.io/${_model.hash}"
+                                                              : "https://${StorageSingleton().currentSelectedNetwork}.tzkt.io/${_model.hash}",
                                                         );
                                                       },
                                                       child: SvgPicture.asset(

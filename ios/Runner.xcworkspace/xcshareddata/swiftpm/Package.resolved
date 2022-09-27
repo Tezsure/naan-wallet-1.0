@@ -14,8 +14,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/airgap-it/beacon-ios-sdk",
       "state" : {
-        "revision" : "4a182cef1d1baf1491e413347933c66db32d0891",
-        "version" : "3.1.1-beta.0"
+        "revision" : "c63f976ff2eab2e99714f7ffd6b6a0021a48eaed",
+        "version" : "3.2.1"
       }
     },
     {

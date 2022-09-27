@@ -8,6 +8,8 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:tezster_wallet/app/modules/common/colors_utils/colors.dart';
 import 'package:tezster_wallet/app/modules/common/functions/common_functions.dart';
+import 'package:tezster_wallet/app/modules/splash_page/bindings/splash_page_binding.dart';
+import 'package:tezster_wallet/app/modules/splash_page/views/splash_page_view.dart';
 import 'package:tezster_wallet/app/utils/firebase_analytics/firebase_analytics.dart';
 import 'package:tezster_wallet/beacon/beacon_plugin.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -50,6 +52,11 @@ Future<void> main() async {
           ),
           initialRoute: Routes.SPLASH_PAGE,
           getPages: AppPages.routes,
+          unknownRoute: GetPage(
+            name: Routes.SPLASH_PAGE,
+            page: () => SplashPageView(),
+            binding: SplashPageBinding(),
+          ),
         ),
       ),
     );

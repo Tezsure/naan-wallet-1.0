@@ -11,7 +11,11 @@ class StorageSingleton {
 
   StorageModel storage;
   String currentSelectedNode;
+  String currentSelectedNetwork = "";
   bool isTestNetSelected;
+
+  bool isFxHashFlow = false;
+  String eventUri = "";
 
   updateStorage(StorageModel model) => this.storage = model;
 }

@@ -474,10 +474,10 @@ class _SettingsPageViewState extends State<SettingsPageView> {
                 ),
                 _getContainerBox(
                   child: _getItemContainerWithSubTitle(
-                      "Share Naan", "", "assets/walkthrough/logo.png"),
+                      "Share naan", "", "assets/walkthrough/logo.png"),
                   onTap: () {
                     Share.share(
-                        "👋 Hey friend! You should download Naan, it's my favorite Tezos wallet to buy Tez, send transactions, connecting to Dapps and exploring NFT gallery of anyone. https://naanwallet.com");
+                        "👋 Hey friend! You should download naan, it's my favorite Tezos wallet to buy Tez, send transactions, connecting to Dapps and exploring NFT gallery of anyone. https://naanwallet.com");
                   },
                 ),
                 SizedBox(
@@ -495,9 +495,9 @@ class _SettingsPageViewState extends State<SettingsPageView> {
                 ),
                 _getContainerBox(
                   child: _getItemContainerWithSubTitle(
-                      "Join our discord", "", "assets/wallet/discord.png"),
+                      "Join our Discord", "", "assets/wallet/discord.png"),
                   onTap: () async {
-                    launch("https://discord.gg/jTC5DpmukN");
+                    launch("https://discord.gg/wpcNRsBbxy");
                   },
                 ),
                 SizedBox(

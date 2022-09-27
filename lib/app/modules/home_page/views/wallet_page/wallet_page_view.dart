@@ -443,13 +443,15 @@ class _WalletPageViewState extends State<WalletPageView>
                                       0, data.lastIndexOf('}') + 1);
                                 var baseData = jsonDecode(data);
                                 if (baseData.containsKey('relayServer')) {
-                                  await BeaconPlugin.addPeer(
-                                    baseData['id'],
-                                    baseData['name'],
-                                    baseData['publicKey'],
-                                    baseData['relayServer'],
-                                    baseData['version'] ?? "2",
-                                  );
+                                  await BeaconPlugin.pair(
+                                      baseData['name'], reciverPkHash);
+                                  // await BeaconPlugin.addPeer(
+                                  //   baseData['id'],
+                                  //   baseData['name'],
+                                  //   baseData['publicKey'],
+                                  //   baseData['relayServer'],
+                                  //   baseData['version'] ?? "2",
+                                  // );
                                 } else if (baseData.containsKey('tokenId')) {
                                   await showGetNftPopup(baseData);
                                 }

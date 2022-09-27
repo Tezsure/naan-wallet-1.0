@@ -12,7 +12,8 @@ class OperationUtils {
   // isNaanWallet = 0/1
 
   createNewWalletProccess([isTest = false, name = "Account 1"]) async {
-    StorageModel _storgeModel = await StorageUtils().getStorage();
+    StorageModel _storgeModel =
+        isTest ? StorageModel() : await StorageUtils().getStorage();
 
     // check if naan wallet already exists
     var accounts = _storgeModel.accounts[_storgeModel.provider] ?? [];
@@ -61,9 +62,10 @@ class OperationUtils {
           StorageModel().fromJson(jsonDecode(jsonEncode(StorageModel())));
       _storgeModel.accounts[_storgeModel.provider].add(account);
     }
-    FireAnalytics().logEvent("create_new_wallet", addTz1: true, param: {
-      "tz1": account['publicKeyHash'],
-    });
+    if (!isTest)
+      FireAnalytics().logEvent("create_new_wallet", addTz1: true, param: {
+        "tz1": account['publicKeyHash'],
+      });
     return account;
   }
 

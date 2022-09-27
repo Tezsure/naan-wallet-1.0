@@ -8,7 +8,7 @@
 	-->
 	<uses-permission android:name="android.permission.INTERNET" />
 	<uses-permission android:name="android.permission.USE_FINGERPRINT" />
-	<application tools:replace="android:label,android:roundIcon" android:name="${applicationName}" android:requestLegacyExternalStorage="true" android:label="Naan" android:icon="@mipmap/ic_launcher" android:largeHeap="true" android:roundIcon="@mipmap/ic_launcher_round" android:usesCleartextTraffic="true">
+	<application tools:replace="android:label,android:roundIcon" android:name="io.flutter.app.FlutterApplication" android:requestLegacyExternalStorage="true" android:label="Naan" android:icon="@mipmap/ic_launcher" android:largeHeap="true" android:roundIcon="@mipmap/ic_launcher_round" android:usesCleartextTraffic="true">
 		<activity android:name=".MainActivity" android:exported="true" android:launchMode="singleTop" android:theme="@style/LaunchTheme" android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode" android:hardwareAccelerated="true" android:windowSoftInputMode="adjustResize">
 			<!--
 			Specifies an Android theme to apply to this Activity as soon as
@@ -30,6 +30,7 @@
 				<category android:name="android.intent.category.DEFAULT" />
 				<category android:name="android.intent.category.BROWSABLE" />
 				<data android:scheme="tezos" />
+				<data android:scheme="fxhash" />
 			</intent-filter>
 
 			<meta-data android:name="io.flutter.embedding.android.SplashScreenDrawable" android:resource="@drawable/launch_background" />

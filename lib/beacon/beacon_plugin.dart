@@ -5,14 +5,18 @@ import 'dart:io';
 import 'package:bs58check/bs58check.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:tezster_dart/tezster_dart.dart';
 import 'package:tezster_wallet/app/modules/common/colors_utils/colors.dart';
+import 'package:tezster_wallet/app/modules/home_page/controllers/home_page_controller.dart';
 import 'package:tezster_wallet/app/routes/app_pages.dart';
+import 'package:tezster_wallet/app/utils/storage_utils/storage_singleton.dart';
 import 'package:tezster_wallet/app/utils/storage_utils/storage_utils.dart';
 import 'package:tezster_wallet/models/beacon_permission_model.dart';
 import 'package:uni_links/uni_links.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class BeaconPlugin {
   static var opPair = <String, Object>{}.obs;
@@ -182,6 +186,14 @@ class BeaconPlugin {
     // print("resumed $data");
   }
 
+  static Future<void> pair(String name, String data) async {
+    openConnectionDialog(name);
+    await platform.invokeMethod('pair', <String, dynamic>{
+      'uri': data,
+    });
+    print("addPeer = ");
+  }
+
   static Future<void> addPeer(id, name, publicKey, server, version) async {
     openConnectionDialog(name);
     await platform.invokeMethod('addPeer', <String, dynamic>{
@@ -197,14 +209,50 @@ class BeaconPlugin {
   static Future<void> listenToChannle(callback) async {
     stream.receiveBroadcastStream().listen(callback);
     final initialUri = await getInitialUri();
-    parseLinkAndaddPeer(initialUri.toString());
+    if (initialUri.toString().startsWith("fxhash")) {
+      StorageSingleton().isFxHashFlow = true;
+      StorageSingleton().eventUri = initialUri.toString().substring(9);
+    } else {
+      parseLinkAndaddPeer(initialUri.toString());
+    }
 
     _sub = linkStream.listen((String link) async {
       print(link);
-      parseLinkAndaddPeer(link);
+      if (link.toString().startsWith("fxhash")) {
+        StorageSingleton().isFxHashFlow = true;
+        StorageSingleton().eventUri = link.toString().substring(9);
+        if (Get.currentRoute == Routes.HOME_PAGE) {
+          openDeepLinkFlow();
+        }
+      } else {
+        parseLinkAndaddPeer(link);
+      }
     }, onError: (err) {
       print(err.toString());
     });
+  }
+
+  static openDeepLinkFlow() async {
+    var controller = Get.find<HomePageController>();
+    controller.isWertLaunched.value = true;
+    String url =
+        "https://dev.api.tezsure.com/v1/tezsure/wert/index.html?address=${controller.storage.accounts[controller.storage.provider][controller.storage.currentAccountIndex]['publicKeyHash']}";
+    if (await canLaunch(url)) {
+      await launch(url).then((value) {
+        controller.isWertLaunched.value = false;
+        controller.index.value = 3;
+        try {
+          controller.webViewController.loadUrl(
+              urlRequest: URLRequest(
+                  url: Uri.parse(Platform.isIOS
+                      ? "https://" + StorageSingleton().eventUri
+                      : StorageSingleton().eventUri),
+                  iosAllowsExpensiveNetworkAccess: true));
+        } catch (e) {
+          print(e.toString());
+        }
+      });
+    }
   }
 
   static parseLinkAndaddPeer(String link) async {
@@ -217,13 +265,13 @@ class BeaconPlugin {
       if (!data.endsWith("}"))
         data = data.substring(0, data.lastIndexOf('}') + 1);
       var baseData = jsonDecode(data);
-      await BeaconPlugin.addPeer(
-        baseData['id'],
-        baseData['name'],
-        baseData['publicKey'],
-        baseData['relayServer'],
-        "2",
-      );
+      await BeaconPlugin.pair(baseData['name'], link);
+      //   baseData['id'],
+      //   baseData['name'],
+      //   baseData['publicKey'],
+      //   baseData['relayServer'],
+      //   "2",
+      // );
     } catch (e) {}
   }
 

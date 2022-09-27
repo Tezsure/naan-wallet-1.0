@@ -29,7 +29,7 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_file_path_provider: ^0.0.3
-  # flutter_inappwebview: 5.3.1
+  flutter_inappwebview: 5.3.1
   flutter_secure_storage: ^4.2.0
   flutter_svg: ^0.22.0
   fluttertoast: ^8.0.3
@@ -44,8 +44,8 @@ dependencies:
   simple_gql: ^1.2.0
   tezster_dart:
     git:
-      url: https://github.com/Jay-Tezsure/Tezster_dart.git
-      ref: gasFeeCal
+      url: https://github.com/Tezsure/Tezster_dart.git
+      ref: feat/gasFeeCalculator
   uni_links: ^0.5.1
   url_launcher: ^6.0.6
   video_player: ^2.2.3

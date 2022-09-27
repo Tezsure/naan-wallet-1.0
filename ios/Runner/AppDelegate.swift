@@ -35,6 +35,22 @@ import Flutter
                     }
                 })
             }
+            else if(call.method == "pair"){
+                
+                guard let newData = call.arguments as? [String:Any] else{
+                    result("Error in parameters")
+                    return
+                }
+                
+                var uri :String
+                uri = ""
+                if let newUri = newData["uri"]{
+                    uri = "\(newUri)"
+                }
+                beaconController.pair(uri: uri)
+                result("1")
+                
+            }
             else if(call.method == "addPeer"){
                 guard let newData = call.arguments as? [String:Any] else{
                     result("Error in parameters")
