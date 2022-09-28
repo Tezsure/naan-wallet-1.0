@@ -550,9 +550,9 @@ packages:
     dependency: "direct main"
     description:
       path: "."
-      ref: gasFeeCal
-      resolved-ref: fe2a9acc337a3896d4616f8e81c03f25dcf4b3c0
-      url: "https://github.com/Jay-Tezsure/Tezster_dart.git"
+      ref: "feat/gasFeeCalculator"
+      resolved-ref: "82923d24b2e5986396cd280a8089113e69581528"
+      url: "https://github.com/Tezsure/Tezster_dart.git"
     source: git
     version: "2.1.2-beta.2"
   typed_data:
