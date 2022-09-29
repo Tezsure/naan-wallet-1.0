@@ -12,6 +12,21 @@ import 'package:tezster_wallet/app/modules/home_page/controllers/home_page_contr
 import 'package:tezster_wallet/app/modules/usdt/nft_usdt.dart';
 import 'package:tezster_wallet/beacon/beacon_plugin.dart';
 
+class NFT {
+  String lowestAsk;
+  String description;
+  String buyId;
+  String name;
+  String faContract;
+
+  NFT(
+      {this.buyId,
+      this.description,
+      this.lowestAsk,
+      this.name,
+      this.faContract});
+}
+
 class DappWidget extends StatefulWidget {
   final HomePageController controller;
 
@@ -44,6 +59,8 @@ class _DappWidgetState extends State<DappWidget>
   ContextMenu contextMenu;
   String url = "";
   double progress = 0;
+  String fa = "";
+  String tokenId = "";
   final urlController = TextEditingController();
   bool showButton = false;
   @override
@@ -125,6 +142,68 @@ class _DappWidgetState extends State<DappWidget>
                 openBackgroundColor: Color(0xFF7DCDF2),
                 labelsBackgroundColor: Colors.white,
                 speedDialChildren: <SpeedDialChild>[
+                  SpeedDialChild(
+                    child: Icon(Icons.credit_card),
+                    foregroundColor: Colors.white,
+                    backgroundColor: Colors.pinkAccent,
+                    label: 'Buy with credit card',
+                    onPressed: () async {
+                      var response;
+                      if (fa.startsWith('KT1')) {
+                        response = await GQLClient(
+                          'https://data.objkt.com/v2/graphql',
+                        ).query(
+                          query: r'''
+                                  query NftDetails($address: String!, $tokenId: String!) {
+                                    token(where: {token_id: {_eq: $tokenId}, fa_contract: {_eq: $address}}) {
+                                      description
+                                      name
+                                      fa_contract
+                                      asks(limit: 1,where: {status: {_eq: "active"}}, order_by: {price: asc}) {
+                                        id
+                                        price
+                                      }
+                                    }
+                                  }
+                              ''',
+                          variables: {'address': fa, 'tokenId': tokenId},
+                        );
+                      } else {
+                        response = await GQLClient(
+                          'https://data.objkt.com/v2/graphql',
+                        ).query(
+                          query: r'''
+                                query NftDetails($address: String!, $tokenId: String!) {
+                                  token(where: {token_id: {_eq: $tokenId}, fa: {path: {_eq: $address}}}) {
+                                    description
+                                    asks(limit: 1,where: {status: {_eq: "active"}}, order_by: {price: asc}) {
+                                      id
+                                      price
+                                    }
+                                    name
+                                    fa_contract
+                                  }
+                                }
+                            ''',
+                          variables: {'address': fa, 'tokenId': tokenId},
+                        );
+                      }
+                      NFT nft = NFT(
+                          buyId: response.data["token"][0]["asks"][0]["id"]
+                              .toString(),
+                          lowestAsk: response.data["token"][0]["asks"][0]
+                                  ["price"]
+                              .toString(),
+                          name: response.data["token"][0]["name"],
+                          description: response.data["token"][0]["description"],
+                          faContract: response.data["token"][0]["fa_contract"]);
+                      webViewController?.loadUrl(
+                          urlRequest: URLRequest(
+                              url: Uri.parse(
+                                  "https://naan-nft-credit-card.netlify.app/?fa=$fa&tokenId=$tokenId&address=tz1WDRu8H4dHbUwygocLsmaXgHthGiV6JGJG&askId=${nft.buyId}&askPrice=${nft.lowestAsk}&name=${nft.name}")));
+                    },
+                    closeSpeedDialOnPressed: false,
+                  ),
                   SpeedDialChild(
                     child: Icon(Icons.monetization_on_rounded),
                     foregroundColor: Colors.white,
@@ -483,6 +562,8 @@ class _DappWidgetState extends State<DappWidget>
                       }
                       setState(() {
                         if (response.data["token"][0]["asks"].length == 1) {
+                          fa = mainUrl[0];
+                          tokenId = mainUrl[1];
                           showButton = true;
                         } else {
                           showButton = false;
